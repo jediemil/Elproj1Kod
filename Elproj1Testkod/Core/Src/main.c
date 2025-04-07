@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_host.h"
-#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -114,9 +113,12 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-	 HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_14);
-	 HAL_Delay(500);
-	 printf("Hello World!\n");
+    HAL_GPIO_TogglePin (GPIOD, GPIO_PIN_14);
+    HAL_GPIO_TogglePin (GPIOD, GPIO_PIN_15);
+    HAL_GPIO_TogglePin (GPIOD, GPIO_PIN_12);
+    HAL_GPIO_TogglePin (GPIOD, GPIO_PIN_13);
+    HAL_Delay (100);
+	printf("Hello World!\n");
   }
   /* USER CODE END 3 */
 }
@@ -280,8 +282,8 @@ static void MX_SPI1_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
@@ -364,8 +366,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(MEMS_INT2_GPIO_Port, &GPIO_InitStruct);
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
