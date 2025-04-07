@@ -122,6 +122,7 @@ int main(void)
     HAL_GPIO_TogglePin (GPIOD, GPIO_PIN_13);
     HAL_Delay (100);
 	printf("Hello Stopp!\n");
+	printf("I like sussy bussin balls\n")
   }
   /* USER CODE END 3 */
 }
