@@ -1,8 +1,8 @@
-*/Drivers/
-*/EWARM/
-*/Middlewares/
-*/USB_HOST/
-*/.idea/
-*/.DS_STORE
+**/Drivers/
+**/EWARM/
+**/Middlewares/
+**/USB_HOST/
+**/.idea/
+**/.DS_STORE
 .metadata/
 Elproj1Testkod/Debug
