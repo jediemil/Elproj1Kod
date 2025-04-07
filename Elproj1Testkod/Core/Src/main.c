@@ -102,7 +102,7 @@ int main(void)
   MX_SPI1_Init();
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
-
+  printf("Booted!\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
