@@ -102,7 +102,9 @@ int main(void)
   MX_SPI1_Init();
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
+  HAL_Delay(1000);
   printf("Booted!\n");
+  HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
