@@ -1,0 +1,10 @@
+16:57:26 **** Incremental Build of configuration Debug for project Elproj1Testkod ****
+make -j12 all 
+arm-none-eabi-size  Elproj1Testkod.elf 
+   text	   data	    bss	    dec	    hex	filename
+  37804	    136	   4128	  42068	   a454	Elproj1Testkod.elf
+Finished building: default.size.stdout
+ 
+
+16:57:26 Build Finished. 0 errors, 0 warnings. (took 485ms)
+
