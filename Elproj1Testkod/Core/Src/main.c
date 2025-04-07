@@ -105,6 +105,7 @@ int main(void)
   HAL_Delay(1000);
   printf("Booted!\n");
   HAL_Delay(1000);
+  HAL_GPIO_TogglePin (GPIOD, GPIO_PIN_14);
   /* USER CODE END 2 */
 
   /* Infinite loop */
