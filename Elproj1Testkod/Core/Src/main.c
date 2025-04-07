@@ -118,7 +118,7 @@ int main(void)
     HAL_GPIO_TogglePin (GPIOD, GPIO_PIN_12);
     HAL_GPIO_TogglePin (GPIOD, GPIO_PIN_13);
     HAL_Delay (100);
-	printf("Hello World!\n");
+	printf("Hello Stopp!\n");
   }
   /* USER CODE END 3 */
 }
