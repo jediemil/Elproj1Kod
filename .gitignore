@@ -1,7 +1,7 @@
-*/Drivers
-*/EWARM
-*/Middlewares
-*/USB_HOST
+*/Drivers/
+*/EWARM/
+*/Middlewares/
+*/USB_HOST/
 */.idea/
 */.DS_STORE
-*/.metadata/
+.metadata/
