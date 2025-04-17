@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "definitions.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -59,12 +59,15 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define ENC_A_Pin GPIO_PIN_13
-#define ENC_A_GPIO_Port GPIOC
-#define ENC_B_Pin GPIO_PIN_14
-#define ENC_B_GPIO_Port GPIOC
-#define ENC_BTN_Pin GPIO_PIN_15
-#define ENC_BTN_GPIO_Port GPIOC
+#define ENCODER_A_Pin GPIO_PIN_13
+#define ENCODER_A_GPIO_Port GPIOC
+#define ENCODER_A_EXTI_IRQn EXTI13_IRQn
+#define ENCODER_B_Pin GPIO_PIN_14
+#define ENCODER_B_GPIO_Port GPIOC
+#define ENCODER_B_EXTI_IRQn EXTI14_IRQn
+#define ENCODER_SWITCH_Pin GPIO_PIN_15
+#define ENCODER_SWITCH_GPIO_Port GPIOC
+#define ENCODER_SWITCH_EXTI_IRQn EXTI15_IRQn
 #define PD_SCL_Pin GPIO_PIN_13
 #define PD_SCL_GPIO_Port GPIOB
 #define PD_SDA_Pin GPIO_PIN_14
@@ -73,8 +76,6 @@ void Error_Handler(void);
 #define BLUE_GPIO_Port GPIOA
 #define RED_Pin GPIO_PIN_9
 #define RED_GPIO_Port GPIOA
-#define GREEN_Pin GPIO_PIN_10
-#define GREEN_GPIO_Port GPIOA
 #define MOTOR_Pin GPIO_PIN_15
 #define MOTOR_GPIO_Port GPIOA
 #define BUZZER_Pin GPIO_PIN_4
@@ -83,8 +84,6 @@ void Error_Handler(void);
 #define OLED_SCL_GPIO_Port GPIOB
 #define OLED_SDA_Pin GPIO_PIN_7
 #define OLED_SDA_GPIO_Port GPIOB
-#define PD_ALERT_Pin GPIO_PIN_8
-#define PD_ALERT_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

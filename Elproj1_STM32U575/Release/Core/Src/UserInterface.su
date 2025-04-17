@@ -1,0 +1,4 @@
+../Core/Src/UserInterface.cpp:16:1:UserInterface::~UserInterface()	0	static
+../Core/Src/UserInterface.cpp:16:1:virtual UserInterface::~UserInterface()	8	static
+../Core/Src/UserInterface.cpp:11:1:UserInterface::UserInterface()	0	static
+../Core/Src/UserInterface.cpp:20:6:void UserInterface::begin()	40	static

@@ -56,7 +56,7 @@ UART_HandleTypeDef huart4;
 HCD_HandleTypeDef hhcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
-bool motor_initialized = false;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -77,65 +77,8 @@ static void MX_TIM3_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void setPWM(TIM_HandleTypeDef *htim, uint32_t channel, float duty_percent) {
-    if (duty_percent < 0.0f) duty_percent = 0.0f;
-    if (duty_percent > 100.0f) duty_percent = 100.0f;
-    uint32_t counter_period = __HAL_TIM_GET_AUTORELOAD(htim);  			// Get the ARR value (number of ticks per period)
-    uint32_t pulse = (counter_period * duty_percent) / 100;	// Calculate pulse width based on duty cycle percentage
-    __HAL_TIM_SET_COMPARE(htim, channel, pulse);			// Set the compare value (duty cycle)
-    HAL_TIM_PWM_Start(htim, channel);						// Start PWM
-}
 
-void setBuzzer(uint32_t frequency) {
-    TIM_HandleTypeDef *timer = &htim3;           			// Using the timer instance htim3
-    uint32_t channel = TIM_CHANNEL_1;            			// Using channel 1
-    uint32_t duty_percent = 50;  							// Set PWM with 50% duty cycle (buzzer needs square wave
-
-    uint32_t timer_clk_freq = HAL_RCC_GetTimerClockFreq(); 	// Get the timer base clock frequency (after APB scaling)
-    uint32_t prescaler = htim->Init.Prescaler;   			// Get the prescaler value from the timer setup
-    uint32_t tick_freq = timer_clk_freq / (prescaler + 1); 	// Calculate the actual tick frequency
-
-    uint32_t counter_period = (tick_freq / frequency) - 1;	// Calculate the counter period (ARR) based on the desired frequency (ARR = number of ticks per period)
-    __HAL_TIM_SET_AUTORELOAD(timer, counter_period);		// Set the ARR value (the counter period)
-
-    setPWM(timer, channel, duty_percent);
-}
-
-void setLED(uint8_t red_percent, uint8_t green_percent, uint8_t blue_percent) {
-    TIM_HandleTypeDef *htim = &htim1;
-    setPWM(htim, TIM_CHANNEL_2, red_percent);    			// Red on Channel 2
-    setPWM(htim, TIM_CHANNEL_3, green_percent);  			// Green on Channel 3
-    setPWM(htim, TIM_CHANNEL_1, blue_percent);   			// Blue on Channel 1
-}
-
-void initMotor() {
-    TIM_HandleTypeDef *htim = &htim2;
-    HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);  // Start once here
-    setPWM(htim, TIM_CHANNEL_1, 1.0f);       // Initial 1% duty cycle
-    HAL_Delay(5000);                         // Let servo initialize
-    motor_initialized = true;
-}
-
-void setMotor(uint8_t throttle_percent, bool ramp_up) {
-    if (!motor_initialized) return;
-
-    TIM_HandleTypeDef *htim = &htim2;
-    float target_duty = 1.0f + (throttle_percent / 100.0f);	//ramp up from min to max throttle over 5 seconds
-
-    if (ramp_up) {
-        for (float duty = 1.0f; duty <= target_duty; duty += 0.01f) {
-            setPWM(htim, TIM_CHANNEL_1, duty);
-            HAL_Delay(50); // 50ms delay → ~5 seconds total if going from 1% to 2%
-        }
-    }
-    else {
-        setPWM(htim, TIM_CHANNEL_1, target_duty);
-    }
-}
-
-
-
-/*CODE END 0 */
+/* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
@@ -177,8 +120,6 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
-
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -188,6 +129,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+	  printf("SKIBIDI SKIBIDI HAWK TUAH HAWK\n");
+	  ITM_SendChar('a');
+	  HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -203,7 +148,7 @@ void SystemClock_Config(void)
 
   /** Configure the main internal regulator output voltage
   */
-  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE3) != HAL_OK)
+  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -211,14 +156,21 @@ void SystemClock_Config(void)
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI
-                              |RCC_OSCILLATORTYPE_MSI;
+                              |RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
-  RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_4;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMBOOST = RCC_PLLMBOOST_DIV1;
+  RCC_OscInitStruct.PLL.PLLM = 1;
+  RCC_OscInitStruct.PLL.PLLN = 10;
+  RCC_OscInitStruct.PLL.PLLP = 2;
+  RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLR = 1;
+  RCC_OscInitStruct.PLL.PLLRGE = RCC_PLLVCIRANGE_1;
+  RCC_OscInitStruct.PLL.PLLFRACN = 0;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -229,13 +181,13 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
                               |RCC_CLOCKTYPE_PCLK3;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB3CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     Error_Handler();
   }
@@ -301,7 +253,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00000004;
+  hi2c1.Init.Timing = 0x00F07BFF;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -349,7 +301,7 @@ static void MX_I2C2_Init(void)
 
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
-  hi2c2.Init.Timing = 0x00000004;
+  hi2c2.Init.Timing = 0x00F07BFF;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -497,10 +449,6 @@ static void MX_TIM1_Init(void)
     Error_Handler();
   }
   if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -734,17 +682,37 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /*Configure GPIO pins : ENC_A_Pin ENC_B_Pin ENC_BTN_Pin */
-  GPIO_InitStruct.Pin = ENC_A_Pin|ENC_B_Pin|ENC_BTN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : ENCODER_A_Pin ENCODER_B_Pin ENCODER_SWITCH_Pin */
+  GPIO_InitStruct.Pin = ENCODER_A_Pin|ENCODER_B_Pin|ENCODER_SWITCH_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PD_ALERT_Pin PB9 */
-  GPIO_InitStruct.Pin = PD_ALERT_Pin|GPIO_PIN_9;
+  /*Configure GPIO pin : PA10 */
+  GPIO_InitStruct.Pin = GPIO_PIN_10;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB8 PB9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI13_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI13_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI14_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI14_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
