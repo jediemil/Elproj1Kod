@@ -1,0 +1,8 @@
+../Core/Src/stusb4500_nvm.c:125:13:enter_write_mode	40	static
+../Core/Src/stusb4500_nvm.c:191:13:enter_read_mode	40	static
+../Core/Src/stusb4500_nvm.c:211:13:read_sector	48	static
+../Core/Src/stusb4500_nvm.c:243:13:write_sector	48	static
+../Core/Src/stusb4500_nvm.c:284:13:exit_rw_mode	40	static
+../Core/Src/stusb4500_nvm.c:300:13:apply_config	24	static
+../Core/Src/stusb4500_nvm.c:354:6:stusb4500_nvm_read	24	static
+../Core/Src/stusb4500_nvm.c:370:6:stusb4500_nvm_flash	112	static
