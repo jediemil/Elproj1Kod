@@ -210,8 +210,9 @@ int main(void)
 
   //bool success = stusb4500_nvm_flash(&device, &config);
   printf("Begin\n");
-  uint8_t nvm_buf = 10;
-  bool success = stusb4500_nvm_read(&device, &nvm_buf);
+  bool success = stusb4500_set_gpio_state(&device, true);
+  //uint8_t nvm_buf = 10;
+  //bool success = stusb4500_nvm_read(&device, &nvm_buf);
 
   if (success){
 	  printf("True\n");
@@ -220,7 +221,7 @@ int main(void)
 	  printf("False\n");
 	  //setRGB(0, 0, 0);
   }
-  printf("%i", nvm_buf);
+  //printf("%i", nvm_buf);
 
 
   /*if (success) {
