@@ -46,6 +46,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 I2C_HandleTypeDef hi2c2;
+DMA_HandleTypeDef handle_GPDMA1_Channel5;
+DMA_HandleTypeDef handle_GPDMA1_Channel4;
 
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
@@ -60,11 +62,12 @@ bool motor_initialized = false;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_GPDMA1_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_TIM2_Init(void);
-static void MX_TIM3_Init(void);
 static void MX_I2C2_Init(void);
+static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -120,31 +123,37 @@ void setMotorSpeed(float throttle) {
 }
 
 bool write_i2c(uint16_t addr, uint8_t reg, void const* buf, size_t len, void* context) {
-	HAL_Delay(100);
+	HAL_Delay(10);
 	printf("Write\n");
-	uint8_t status = HAL_I2C_Mem_Write(&hi2c2, addr, reg, I2C_MEMADD_SIZE_8BIT, buf, len, context);
+	//__disable_irq();
+	uint8_t status = HAL_I2C_Mem_Write(&hi2c2, addr, reg, I2C_MEMADD_SIZE_8BIT, buf, len, 1000);
+	//__enable_irq();
 	  if (status == HAL_OK) {
-		  setRGB(0, 255, 255);
+		  uint8_t color = rand() % 255;
+		  setRGB(0, color, color);
 		  return true;
 	  } else if (status == HAL_ERROR) {
-		  setRGB(255, 255, 0);
+		  setRGB(255, 0, 0);
 	  } else if (status == HAL_TIMEOUT) {
-		  setRGB(20, 255, 0);
+		  setRGB(0, 0, 255);
 	  }
 	  return false;
 }
 
 bool read_i2c(uint16_t addr, uint8_t reg, void* buf, size_t len, void* context) {
-	HAL_Delay(100);
+	HAL_Delay(10);
 	printf("Read\n");
-	uint8_t status = HAL_I2C_Mem_Read(&hi2c2, addr, reg, I2C_MEMADD_SIZE_8BIT, buf, len, context);
+	//__disable_irq();
+	uint8_t status = HAL_I2C_Mem_Read(&hi2c2, addr, reg, I2C_MEMADD_SIZE_8BIT, buf, len, 1000);
+	//__enable_irq();
 	if (status == HAL_OK) {
-		setRGB(0, 255, 255);
+		uint8_t color = rand() % 255;
+		setRGB(color, 0, color);
 		return true;
 	} else if (status == HAL_ERROR) {
-		setRGB(255, 255, 0);
+		setRGB(255, 0, 20);
 	} else if (status == HAL_TIMEOUT) {
-		setRGB(20, 255, 0);
+		setRGB(0, 0, 20);
 	}
 	return false;
 }
@@ -181,11 +190,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_GPDMA1_Init();
   MX_TIM1_Init();
   MX_USB_OTG_FS_PCD_Init();
   MX_TIM2_Init();
-  MX_TIM3_Init();
   MX_I2C2_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
   stusb4500_t device;
@@ -207,20 +217,36 @@ int main(void)
   config.only_above_5v = false;
   config.gpio_cfg = gpio_cfg;
   setRGB(0, 0, 255);
+  HAL_Delay(1000);
+  setRGB(0, 0, 0);
+  HAL_Delay(1000);
+  setRGB(0, 0, 255);
 
   //bool success = stusb4500_nvm_flash(&device, &config);
   printf("Begin\n");
-  bool success = stusb4500_set_gpio_state(&device, true);
+  //bool success = stusb4500_set_gpio_state(&device, true);
   //uint8_t nvm_buf = 10;
   //bool success = stusb4500_nvm_read(&device, &nvm_buf);
-
-  if (success){
+  uint8_t buf;
+  uint8_t status = HAL_I2C_Mem_Read(&hi2c2, 0x28, 0x2FUL, I2C_MEMADD_SIZE_8BIT, &buf, 1, 1000);
+  printf("%lu", HAL_I2C_GetError(&hi2c2));
+  	//__enable_irq();
+  	if (status == HAL_OK) {
+  		uint8_t color = rand() % 255;
+  		setRGB(color, 0, color);
+  		return true;
+  	} else if (status == HAL_ERROR) {
+  		setRGB(255, 0, 20);
+  	} else if (status == HAL_TIMEOUT) {
+  		setRGB(0, 0, 20);
+  	}
+  /*if (success){
 	  printf("True\n");
 	  setRGB(0, 255, 0);
   } else {
 	  printf("False\n");
 	  //setRGB(0, 0, 0);
-  }
+  }*/
   //printf("%i", nvm_buf);
 
 
@@ -308,6 +334,36 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief GPDMA1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPDMA1_Init(void)
+{
+
+  /* USER CODE BEGIN GPDMA1_Init 0 */
+
+  /* USER CODE END GPDMA1_Init 0 */
+
+  /* Peripheral clock enable */
+  __HAL_RCC_GPDMA1_CLK_ENABLE();
+
+  /* GPDMA1 interrupt Init */
+    HAL_NVIC_SetPriority(GPDMA1_Channel4_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(GPDMA1_Channel4_IRQn);
+    HAL_NVIC_SetPriority(GPDMA1_Channel5_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(GPDMA1_Channel5_IRQn);
+
+  /* USER CODE BEGIN GPDMA1_Init 1 */
+
+  /* USER CODE END GPDMA1_Init 1 */
+  /* USER CODE BEGIN GPDMA1_Init 2 */
+
+  /* USER CODE END GPDMA1_Init 2 */
+
 }
 
 /**
