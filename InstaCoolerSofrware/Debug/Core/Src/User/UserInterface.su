@@ -1,3 +1,0 @@
-../Core/Src/User/UserInterface.cpp:10:1:UserInterface::UserInterface()	16	static
-../Core/Src/User/UserInterface.cpp:15:1:UserInterface::~UserInterface()	16	static
-../Core/Src/User/UserInterface.cpp:15:1:virtual UserInterface::~UserInterface()	16	static
