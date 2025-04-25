@@ -4,5 +4,7 @@
 **/USB_HOST/
 **/.idea/
 **/.DS_STORE
+**/Debug/
+**/Release/
 .metadata/
 Elproj1Testkod/Debug
