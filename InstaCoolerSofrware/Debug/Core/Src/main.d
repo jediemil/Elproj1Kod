@@ -30,7 +30,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_usb.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_pcd_ex.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_exti.h \
- ../Core/Inc/include.h ../Core/Inc/stusb4500.h
+ ../Core/Inc/gpdma.h ../Core/Inc/main.h ../Core/Inc/i2c.h \
+ ../Core/Inc/memorymap.h ../Core/Inc/tim.h ../Core/Inc/usb_otg.h \
+ ../Core/Inc/gpio.h ../Core/Src/User/main_cpp.h
 ../Core/Inc/main.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal.h:
 ../Core/Inc/stm32u5xx_hal_conf.h:
@@ -63,5 +65,11 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_ll_usb.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_pcd_ex.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_exti.h:
-../Core/Inc/include.h:
-../Core/Inc/stusb4500.h:
+../Core/Inc/gpdma.h:
+../Core/Inc/main.h:
+../Core/Inc/i2c.h:
+../Core/Inc/memorymap.h:
+../Core/Inc/tim.h:
+../Core/Inc/usb_otg.h:
+../Core/Inc/gpio.h:
+../Core/Src/User/main_cpp.h:

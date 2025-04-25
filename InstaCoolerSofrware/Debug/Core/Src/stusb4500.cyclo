@@ -1,7 +1,0 @@
-../Core/Src/stusb4500.c:74:13:send_pd_message	3
-../Core/Src/stusb4500.c:80:13:is_present	4
-../Core/Src/stusb4500.c:88:3:wait_until_ready_with_timeout	6
-../Core/Src/stusb4500.c:104:13:write_pdo	3
-../Core/Src/stusb4500.c:123:13:load_optimal_pdo	9
-../Core/Src/stusb4500.c:195:6:stusb4500_negotiate	21
-../Core/Src/stusb4500.c:274:6:stusb4500_set_gpio_state	2

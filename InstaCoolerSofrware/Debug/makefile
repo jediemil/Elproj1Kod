@@ -11,8 +11,9 @@ RM := rm -rf
 -include sources.mk
 -include Drivers/STM32U5xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
--include Core/Src/Control/subdir.mk
+-include Core/Src/User/subdir.mk
 -include Core/Src/subdir.mk
+-include Core/Inc/stusb4500/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -85,8 +86,8 @@ all: main-build
 main-build: InstaCoolerSoftware.elf secondary-outputs
 
 # Tool invocations
-InstaCoolerSoftware.elf InstaCoolerSoftware.map: $(OBJS) $(USER_OBJS) C:\Users\emilr\Projekt\Elproj1Kod\InstaCoolerSofrware\STM32U575CGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "InstaCoolerSoftware.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m33 -T"C:\Users\emilr\Projekt\Elproj1Kod\InstaCoolerSofrware\STM32U575CGTX_FLASH.ld" -Wl,-Map="InstaCoolerSoftware.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+InstaCoolerSoftware.elf InstaCoolerSoftware.map: $(OBJS) $(USER_OBJS) C:\Users\emilr\Projekt\KTH\Elproj1Kod\InstaCoolerSofrware\STM32U575CGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "InstaCoolerSoftware.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m33 -T"C:\Users\emilr\Projekt\KTH\Elproj1Kod\InstaCoolerSofrware\STM32U575CGTX_FLASH.ld" -Wl,-Map="InstaCoolerSoftware.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

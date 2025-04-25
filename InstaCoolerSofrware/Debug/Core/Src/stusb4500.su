@@ -1,7 +1,0 @@
-../Core/Src/stusb4500.c:74:13:send_pd_message	40	static
-../Core/Src/stusb4500.c:80:13:is_present	40	static
-../Core/Src/stusb4500.c:88:3:wait_until_ready_with_timeout	40	static
-../Core/Src/stusb4500.c:104:13:write_pdo	48	static
-../Core/Src/stusb4500.c:123:13:load_optimal_pdo	56	static
-../Core/Src/stusb4500.c:195:6:stusb4500_negotiate	88	static
-../Core/Src/stusb4500.c:274:6:stusb4500_set_gpio_state	32	static

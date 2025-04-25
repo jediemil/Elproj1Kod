@@ -1,3 +1,0 @@
-../Core/Src/Control/UserInterface.cpp:10:1:UserInterface::UserInterface()	1
-../Core/Src/Control/UserInterface.cpp:15:1:UserInterface::~UserInterface()	1
-../Core/Src/Control/UserInterface.cpp:15:1:virtual UserInterface::~UserInterface()	1
