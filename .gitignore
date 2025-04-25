@@ -6,5 +6,6 @@
 **/.DS_STORE
 **/Debug/
 **/Release/
+**/.settings/
 .metadata/
 Elproj1Testkod/Debug
