@@ -12,6 +12,8 @@
 #include <stdio.h>
 
 #include "stusb4500/stusb4500.h"
+#include "sd1306/ssd1306.h"
+#include "sd1306/ssd1306_fonts.h"
 
 #include "tim.h"
 #include "i2c.h"
@@ -23,6 +25,7 @@
 bool motor_initialized = false;
 static Status status(1);
 static UserInterface userInterface(&status);
+volatile int encoder_counter = 0; //TODO: Varför volatile?
 
 void setPWM(TIM_HandleTypeDef *timer_handle, uint32_t timer_channel, uint8_t duty) {
     uint32_t counter_period = __HAL_TIM_GET_AUTORELOAD(timer_handle); // Get the ARR value (number of ticks per period)
@@ -107,7 +110,32 @@ bool read_i2c(uint16_t addr, uint8_t reg, void* buf, size_t len, void* context) 
 	return false;
 }
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if (GPIO_Pin == GPIO_PIN_0)  // PE0 or PB0
+	{
+		// Check direction using second pin (you decide which is A and which is B)
+		if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_SET) {
+			encoder_counter++;  // Clockwise
+		} else {
+			encoder_counter--;  // Counter-clockwise
+		}
+	}
+}
+
 int main_cpp() {
+
+	ssd1306_Init();
+	char buffer[20];
+
+	ssd1306_Fill(Black);
+
+	printf(buffer, "Count: %d", encoder_counter);
+	ssd1306_SetCursor(0, 0);
+	ssd1306_WriteString(buffer, Font_11x18, White);
+	ssd1306_UpdateScreen();
+
+
 	stusb4500_t device;
 	device.addr = 0x28;
 	device.write = &write_i2c;

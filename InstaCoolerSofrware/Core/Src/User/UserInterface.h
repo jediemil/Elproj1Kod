@@ -34,6 +34,10 @@ private:
     void setupAutostart();
 
 	void none();
+    void select();
+    void unselect();
+    void increaseSelection();
+    void decreaseSelection();
 
    	Status* status;
 
