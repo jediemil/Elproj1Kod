@@ -53,7 +53,7 @@ include_directories(Core/Inc Drivers/STM32U5xx_HAL_Driver/Inc Drivers/STM32U5xx_
 
 add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32U575xx -DDEBUG -DUSE_HAL_DRIVER -DSTM32U575xx)
 
-file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "Core/*.*" "Drivers/*.*")
+file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "Core/*.*")
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32U575CGTX_FLASH.ld)
 

@@ -18,9 +18,11 @@
 
 #include "Status.h"
 #include "include.h"
+#include "UserInterface.h"
 
 bool motor_initialized = false;
-static Status status();
+static Status status(1);
+static UserInterface userInterface(&status);
 
 void setPWM(TIM_HandleTypeDef *timer_handle, uint32_t timer_channel, uint8_t duty) {
     uint32_t counter_period = __HAL_TIM_GET_AUTORELOAD(timer_handle); // Get the ARR value (number of ticks per period)
@@ -100,20 +102,19 @@ bool read_i2c(uint16_t addr, uint8_t reg, void* buf, size_t len, void* context) 
 	} else if (status == HAL_ERROR) {
 		setRGB(255, 0, 20);
 	} else if (status == HAL_TIMEOUT) {
-		setRGB(0, 0, 20);
+		setRGB(0,0,20);
 	}
 	return false;
 }
 
-int main_cpp()
-{
+int main_cpp() {
 	stusb4500_t device;
-	  device.addr = 0x28;
-	  device.write = &write_i2c;
-	  device.read = &read_i2c;
-	  device.context = (void*)1000;
-	  stusb4500_gpio_cfg_t gpio_cfg;
-	  gpio_cfg = STUSB4500_GPIO_CFG_SINK_POWER;
+	device.addr = 0x28;
+	device.write = &write_i2c;
+	device.read = &read_i2c;
+	device.context = (void*)1000;
+	stusb4500_gpio_cfg_t gpio_cfg;
+	gpio_cfg = STUSB4500_GPIO_CFG_SINK_POWER;
 	  stusb4500_nvm_config_t config;
 	  config.pdo1_current_ma = 500;
 	  config.pdo2_voltage_mv = 1500;
@@ -164,39 +165,7 @@ int main_cpp()
 	  } else {
 		  setRGB(255, 0, 0);
 	  }*/
-	  /* USER CODE END 2 */
+	  while (1) {
 
-	  /* Infinite loop */
-	  /* USER CODE BEGIN WHILE */
-	  while (1)
-	  {
-		/*for (int i = 0; i < 255; i++) {
-			setRGB(255, i, 0);
-			HAL_Delay(10);
-		}
-		for (int i = 255; i >= 0; i--) {
-			setRGB(i, 255, 0);
-			HAL_Delay(10);
-		}
-		for (int i = 0; i < 255; i++) {
-			setRGB(0, 255, i);
-			HAL_Delay(10);
-		}
-			for (int i = 255; i >= 0; i--) {
-			setRGB(0, i, 255);
-			HAL_Delay(10);
-		}
-		for (int i = 0; i < 255; i++) {
-			setRGB(i, 0, 255);
-			HAL_Delay(10);
-		}
-		for (int i = 255; i >= 0; i--) {
-			setRGB(255, 0, i);
-			HAL_Delay(10);
-		}*/
-	    /* USER CODE END WHILE */
-
-	    /* USER CODE BEGIN 3 */
 	  }
-	  /* USER CODE END 3 */
 }

@@ -5,14 +5,13 @@
  *      Author: emilr
  */
 
-#include "../User/UserInterface.h"
+#include "UserInterface.h"
 
-UserInterface::UserInterface() {
-	// TODO Auto-generated constructor stub
+UserInterface::UserInterface(Status* status) {
+    leftCall = &UserInterface::none;
+    rightCall = &UserInterface::none;
+    clickCall = &UserInterface::none;
+    currentScreen = &UserInterface::drawWelcome;
 
+    this->status = status;
 }
-
-UserInterface::~UserInterface() {
-	// TODO Auto-generated destructor stub
-}
-
