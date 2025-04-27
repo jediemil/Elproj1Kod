@@ -7,15 +7,16 @@
 
 #include "Status.h"
 
-Status::Status(int i) {
-	// TODO Auto-generated constructor stub
+Status::Status() {
+	motorInitialized = false;
+    motorSpeed = 0;
 
 }
 
-void Status::setMotorSpeed(uint8_t speed) {
+void Status::setMotorSpeed(float speed) {
   this->motorSpeed = speed;
 }
 
-uint8_t Status::getMotorSpeed() {
+float Status::getMotorSpeed() {
     return this->motorSpeed;
 }

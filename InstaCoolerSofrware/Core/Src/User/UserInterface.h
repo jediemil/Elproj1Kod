@@ -19,36 +19,25 @@ public:
     void begin();
 
     void leftSwipe();
-
     void rightSwipe();
-
     void click();
 
     void drawScreen();
 
-    void setScreen(method_function screen_function);
-
 private:
     void drawWelcome();
-
     void drawInfoScreen();
-
     void drawAutostart();
 
     void setupWelcome();
-
     void setupInfoScreen();
-
     void setupAutostart();
 
     void none();
-
     void select();
-
     void unselect();
-
+    void toggleSelect();
     void increaseSelection();
-
     void decreaseSelection();
 
     bool selected;
@@ -57,11 +46,8 @@ private:
     Status *status;
 
     void (UserInterface::*leftCall)();
-
     void (UserInterface::*rightCall)();
-
     void (UserInterface::*clickCall)();
-
     void (UserInterface::*currentScreen)();
 
     //method_function screens[3] = {&UserInterface::drawWelcome, &UserInterface::drawInfoScreen, &UserInterface::drawAutostart};

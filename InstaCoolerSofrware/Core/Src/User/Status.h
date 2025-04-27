@@ -12,12 +12,14 @@
 
 class Status {
 public:
-	Status(int i);
-	void setMotorSpeed(uint8_t speed);
-    uint8_t getMotorSpeed();
+	Status();
+	void setMotorSpeed(float speed);
+    float getMotorSpeed();
+
+	bool motorInitialized;
 
 private:
-  uint8_t motorSpeed;
+  float motorSpeed;
 };
 
 #endif /* SRC_USER_STATUS_H_ */

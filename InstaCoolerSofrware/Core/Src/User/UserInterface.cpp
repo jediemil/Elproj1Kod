@@ -42,6 +42,12 @@ void UserInterface::begin() {
 }
 
 void UserInterface::drawWelcome() {
+    char word[] = "Välkommen";
+
+    ssd1306_Fill(Black);
+    ssd1306_SetCursor(0, 0);
+    ssd1306_WriteString(word, Font_11x18, White);
+    ssd1306_UpdateScreen();
 }
 
 void UserInterface::drawInfoScreen() {
@@ -63,13 +69,37 @@ void UserInterface::none() {
 }
 
 void UserInterface::select() {
+    selected = true;
 }
 
 void UserInterface::unselect() {
+    selected = false;
+}
+
+void UserInterface::toggleSelect() {
+    selected = !selected;
 }
 
 void UserInterface::increaseSelection() {
+    selection++;
 }
 
 void UserInterface::decreaseSelection() {
+    selection--;
+}
+
+void UserInterface::drawScreen() {
+    *currentScreen();
+}
+
+void UserInterface::click() {
+    *clickCall();
+}
+
+void UserInterface::rightSwipe() {
+    *rightCall();
+}
+
+void UserInterface::leftSwipe() {
+    *leftCall();
 }

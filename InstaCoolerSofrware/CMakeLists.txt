@@ -49,24 +49,17 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
+include_directories(Core/Inc Drivers/STM32U5xx_HAL_Driver/Inc Drivers/STM32U5xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32U5xx/Include Drivers/CMSIS/Include Core/Inc Drivers/STM32U5xx_HAL_Driver/Inc Drivers/STM32U5xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32U5xx/Include Drivers/CMSIS/Include)
 include_directories(
-        Inc
-        Core/Inc
-        Drivers/STM32U5xx_HAL_Driver/Inc
-        Drivers/CMSIS/Device/ST/STM32U5xx/Include
-        Drivers/CMSIS/Include
-
-        # GCC ARM toolchain includes
-        C:/ST/STM32CubeIDE_1.18.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/arm-none-eabi/include
-        C:/ST/STM32CubeIDE_1.18.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/lib/gcc/arm-none-eabi/13.3.1/include
+    C:/ST/STM32CubeIDE_1.18.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/arm-none-eabi/include
+    C:/ST/STM32CubeIDE_1.18.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/lib/gcc/arm-none-eabi/13.3.1/include
 )
 
 add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32U575xx -DDEBUG -DUSE_HAL_DRIVER -DSTM32U575xx)
 
 file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "Core/*.*")
 
-set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32U575CGTX_FLASH.ld
-        Core/Src/User/overrides.cpp)
+set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32U575CGTX_FLASH.ld)
 
 add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
 add_link_options(-mcpu=cortex-m33 -mthumb -mthumb-interwork)
