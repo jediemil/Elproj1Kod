@@ -110,17 +110,10 @@ bool read_i2c(uint16_t addr, uint8_t reg, void *buf, size_t len, void *context) 
     return false;
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    if (GPIO_Pin == GPIO_PIN_0) // PE0 or PB0
-    {
-        // Check direction using second pin (you decide which is A and which is B)
-        if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_SET) {
-            encoder_counter++; // Clockwise
-        } else {
-            encoder_counter--; // Counter-clockwise
-        }
-    }
+void change_encoder(int change) {
+    encoder_counter += change;
 }
+
 
 int main_cpp() {
     userInterface.begin();

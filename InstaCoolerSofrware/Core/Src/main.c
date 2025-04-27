@@ -165,18 +165,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-int _write(int file, char *ptr, int len)
-{
-  (void)file;
-  int DataIdx;
 
-  for (DataIdx = 0; DataIdx < len; DataIdx++)
-  {
-    //__io_putchar(*ptr++);
-	  ITM_SendChar(*ptr++);
-  }
-  return len;
-}
 /* USER CODE END 4 */
 
 /**

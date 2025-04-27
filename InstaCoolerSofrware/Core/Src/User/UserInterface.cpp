@@ -32,7 +32,8 @@ UserInterface::UserInterface(Status *status) {
 
 void UserInterface::begin() {
     ssd1306_Init();
-    char *buffer = 'hello';
+    char word[6] = "hello";
+    char *buffer = word;
 
     ssd1306_Fill(Black);
     ssd1306_SetCursor(0, 0);

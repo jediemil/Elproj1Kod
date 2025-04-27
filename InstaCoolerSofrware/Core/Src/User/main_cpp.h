@@ -7,6 +7,7 @@ extern "C"
 #endif
 
 int main_cpp();
+void change_encoder(int change);
 
 #ifdef __cplusplus
 }
