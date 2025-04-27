@@ -12,12 +12,16 @@
 
 class UserInterface {
 public:
-	typedef void (UserInterface::*method_function)();
+    typedef void (UserInterface::*method_function)();
 
-	UserInterface(Status* status);
+    UserInterface(Status *status);
+
+    void begin();
 
     void leftSwipe();
+
     void rightSwipe();
+
     void click();
 
     void drawScreen();
@@ -25,28 +29,43 @@ public:
     void setScreen(method_function screen_function);
 
 private:
-	void drawWelcome();
-	void drawInfoScreen();
-	void drawAutostart();
+    void drawWelcome();
 
-   	void setupWelcome();
-   	void setupInfoScreen();
+    void drawInfoScreen();
+
+    void drawAutostart();
+
+    void setupWelcome();
+
+    void setupInfoScreen();
+
     void setupAutostart();
 
-	void none();
+    void none();
+
     void select();
+
     void unselect();
+
     void increaseSelection();
+
     void decreaseSelection();
 
-   	Status* status;
+    bool selected;
+    int selection;
 
-    method_function leftCall;
-	method_function rightCall;
-	method_function clickCall;
-    method_function currentScreen;
-	//method_function screens[3] = {&UserInterface::drawWelcome, &UserInterface::drawInfoScreen, &UserInterface::drawAutostart};
-	//method_function setups[3] = {&UserInterface::setupWelcome, &UserInterface::setupInfoScreen, &UserInterface::setupAutostart};
+    Status *status;
+
+    void (UserInterface::*leftCall)();
+
+    void (UserInterface::*rightCall)();
+
+    void (UserInterface::*clickCall)();
+
+    void (UserInterface::*currentScreen)();
+
+    //method_function screens[3] = {&UserInterface::drawWelcome, &UserInterface::drawInfoScreen, &UserInterface::drawAutostart};
+    //method_function setups[3] = {&UserInterface::setupWelcome, &UserInterface::setupInfoScreen, &UserInterface::setupAutostart};
 };
 
 #endif /* SRC_USER_USERINTERFACE_H_ */

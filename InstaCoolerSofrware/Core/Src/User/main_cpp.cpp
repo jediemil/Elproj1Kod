@@ -8,15 +8,13 @@
 #include "main_cpp.h"
 
 #include <stdlib.h>
-#include <stdbool.h>
 #include <stdio.h>
 
 #include "stusb4500/stusb4500.h"
-#include "sd1306/ssd1306.h"
-#include "sd1306/ssd1306_fonts.h"
 
-#include "tim.h"
+#include "main.h"
 #include "i2c.h"
+#include "tim.h"
 
 #include "Status.h"
 #include "include.h"
@@ -34,16 +32,18 @@ void setPWM(TIM_HandleTypeDef *timer_handle, uint32_t timer_channel, uint8_t dut
     HAL_TIM_PWM_Start(timer_handle, timer_channel); // Start PWM
 }
 
-void setBuzzerFrequency(uint32_t frequency) { //TODO: SKRIV OM KOD SÅ DNE ÄR RIMLIG OCH VÅR EGEN
-    TIM_HandleTypeDef *timer = &htim3;           			// Using the timer instance htim3
-    uint32_t channel = TIM_CHANNEL_1;            			// Using channel 1
+void setBuzzerFrequency(uint32_t frequency) {
+    //TODO: SKRIV OM KOD SÅ DNE ÄR RIMLIG OCH VÅR EGEN
+    TIM_HandleTypeDef *timer = &htim3; // Using the timer instance htim3
+    uint32_t channel = TIM_CHANNEL_1; // Using channel 1
 
-    uint32_t timer_clk_freq = HAL_RCC_GetSysClockFreq(); 	// Get the timer base clock frequency (after APB scaling)
-    uint32_t prescaler = timer->Init.Prescaler;   			// Get the prescaler value from the timer setup
-    uint32_t tick_freq = timer_clk_freq / (prescaler + 1); 	// Calculate the actual tick frequency
+    uint32_t timer_clk_freq = HAL_RCC_GetSysClockFreq(); // Get the timer base clock frequency (after APB scaling)
+    uint32_t prescaler = timer->Init.Prescaler; // Get the prescaler value from the timer setup
+    uint32_t tick_freq = timer_clk_freq / (prescaler + 1); // Calculate the actual tick frequency
 
-    uint32_t counter_period = (tick_freq / frequency) - 1;	// Calculate the counter period (ARR) based on the desired frequency (ARR = number of ticks per period)
-    __HAL_TIM_SET_AUTORELOAD(timer, counter_period);		// Set the ARR value (the counter period)
+    uint32_t counter_period = (tick_freq / frequency) - 1;
+    // Calculate the counter period (ARR) based on the desired frequency (ARR = number of ticks per period)
+    __HAL_TIM_SET_AUTORELOAD(timer, counter_period); // Set the ARR value (the counter period)
 
     setPWM(timer, channel, 128);
 }
@@ -67,133 +67,120 @@ void initMotor() {
 }
 
 void setMotorSpeed(float throttle) {
-	if (!motor_initialized) return;
+    if (!motor_initialized) return;
 
-	TIM_HandleTypeDef *htim = &MOTOR_TIMER_HANDLE;
-	uint8_t duty = (throttle / 100.0f + 0.01f) * 255;
-	setPWM(htim, MOTOR_TIMER_CHANNEL, duty);
+    TIM_HandleTypeDef *htim = &MOTOR_TIMER_HANDLE;
+    uint8_t duty = (throttle / 100.0f + 0.01f) * 255;
+    setPWM(htim, MOTOR_TIMER_CHANNEL, duty);
 }
 
-bool write_i2c(uint16_t addr, uint8_t reg, void const* buf, size_t len, void* context) {
-	HAL_Delay(10);
-	printf("Write\n");
-	//__disable_irq();
-	uint8_t status = HAL_I2C_Mem_Write(&hi2c2, addr, reg, I2C_MEMADD_SIZE_8BIT, (uint8_t*)buf, len, 1000);
-	//__enable_irq();
-	  if (status == HAL_OK) {
-		  uint8_t color = rand() % 255;
-		  setRGB(0, color, color);
-		  return true;
-	  } else if (status == HAL_ERROR) {
-		  setRGB(255, 0, 0);
-	  } else if (status == HAL_TIMEOUT) {
-		  setRGB(0, 0, 255);
-	  }
-	  return false;
+bool write_i2c(uint16_t addr, uint8_t reg, void const *buf, size_t len, void *context) {
+    HAL_Delay(10);
+    printf("Write\n");
+    //__disable_irq();
+    uint8_t status = HAL_I2C_Mem_Write(&hi2c2, addr, reg, I2C_MEMADD_SIZE_8BIT, (uint8_t *) buf, len, 1000);
+    //__enable_irq();
+    if (status == HAL_OK) {
+        uint8_t color = rand() % 255;
+        setRGB(0, color, color);
+        return true;
+    } else if (status == HAL_ERROR) {
+        setRGB(255, 0, 0);
+    } else if (status == HAL_TIMEOUT) {
+        setRGB(0, 0, 255);
+    }
+    return false;
 }
 
-bool read_i2c(uint16_t addr, uint8_t reg, void* buf, size_t len, void* context) {
-	HAL_Delay(10);
-	printf("Read\n");
-	//__disable_irq();
-	uint8_t status = HAL_I2C_Mem_Read(&hi2c2, addr, reg, I2C_MEMADD_SIZE_8BIT, (uint8_t*)buf, len, 1000);
-	//__enable_irq();
-	if (status == HAL_OK) {
-		uint8_t color = rand() % 255;
-		setRGB(color, 0, color);
-		return true;
-	} else if (status == HAL_ERROR) {
-		setRGB(255, 0, 20);
-	} else if (status == HAL_TIMEOUT) {
-		setRGB(0,0,20);
-	}
-	return false;
+bool read_i2c(uint16_t addr, uint8_t reg, void *buf, size_t len, void *context) {
+    HAL_Delay(10);
+    printf("Read\n");
+    //__disable_irq();
+    uint8_t status = HAL_I2C_Mem_Read(&hi2c2, addr, reg, I2C_MEMADD_SIZE_8BIT, (uint8_t *) buf, len, 1000);
+    //__enable_irq();
+    if (status == HAL_OK) {
+        uint8_t color = rand() % 255;
+        setRGB(color, 0, color);
+        return true;
+    } else if (status == HAL_ERROR) {
+        setRGB(255, 0, 20);
+    } else if (status == HAL_TIMEOUT) {
+        setRGB(0, 0, 20);
+    }
+    return false;
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if (GPIO_Pin == GPIO_PIN_0)  // PE0 or PB0
-	{
-		// Check direction using second pin (you decide which is A and which is B)
-		if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_SET) {
-			encoder_counter++;  // Clockwise
-		} else {
-			encoder_counter--;  // Counter-clockwise
-		}
-	}
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    if (GPIO_Pin == GPIO_PIN_0) // PE0 or PB0
+    {
+        // Check direction using second pin (you decide which is A and which is B)
+        if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_SET) {
+            encoder_counter++; // Clockwise
+        } else {
+            encoder_counter--; // Counter-clockwise
+        }
+    }
 }
 
 int main_cpp() {
+    userInterface.begin();
 
-	ssd1306_Init();
-	char buffer[20];
+    stusb4500_t device;
+    device.addr = 0x28;
+    device.write = &write_i2c;
+    device.read = &read_i2c;
+    device.context = (void *) 1000;
+    stusb4500_gpio_cfg_t gpio_cfg = STUSB4500_GPIO_CFG_SINK_POWER;
+    stusb4500_nvm_config_t config;
+    config.pdo1_current_ma = 500;
+    config.pdo2_voltage_mv = 1500;
+    config.pdo2_current_ma = 3000;
+    config.pdo3_voltage_mv = 12000;
+    config.pdo3_current_ma = 3000;
+    config.num_valid_pdos = 3;
+    config.pdo_current_fallback = 0;
+    config.use_src_current = false;
+    config.only_above_5v = false;
+    config.gpio_cfg = gpio_cfg;
+    setRGB(0, 0, 255);
+    HAL_Delay(1000);
+    setRGB(0, 0, 0);
+    HAL_Delay(1000);
+    setRGB(0, 0, 255);
 
-	ssd1306_Fill(Black);
-
-	printf(buffer, "Count: %d", encoder_counter);
-	ssd1306_SetCursor(0, 0);
-	ssd1306_WriteString(buffer, Font_11x18, White);
-	ssd1306_UpdateScreen();
-
-
-	stusb4500_t device;
-	device.addr = 0x28;
-	device.write = &write_i2c;
-	device.read = &read_i2c;
-	device.context = (void*)1000;
-	stusb4500_gpio_cfg_t gpio_cfg;
-	gpio_cfg = STUSB4500_GPIO_CFG_SINK_POWER;
-	  stusb4500_nvm_config_t config;
-	  config.pdo1_current_ma = 500;
-	  config.pdo2_voltage_mv = 1500;
-	  config.pdo2_current_ma = 3000;
-	  config.pdo3_voltage_mv = 12000;
-	  config.pdo3_current_ma = 3000;
-	  config.num_valid_pdos = 3;
-	  config.pdo_current_fallback = 0;
-	  config.use_src_current = false;
-	  config.only_above_5v = false;
-	  config.gpio_cfg = gpio_cfg;
-	  setRGB(0, 0, 255);
-	  HAL_Delay(1000);
-	  setRGB(0, 0, 0);
-	  HAL_Delay(1000);
-	  setRGB(0, 0, 255);
-
-	  //bool success = stusb4500_nvm_flash(&device, &config);
-	  printf("Begin\n");
-	  //bool success = stusb4500_set_gpio_state(&device, true);
-	  //uint8_t nvm_buf = 10;
-	  //bool success = stusb4500_nvm_read(&device, &nvm_buf);
-	  //uint8_t buf;
-	  /*uint8_t status = HAL_I2C_Mem_Read(&hi2c2, 0x28, 0x2FUL, I2C_MEMADD_SIZE_8BIT, &buf, 1, 1000);
-	  printf("%lu", HAL_I2C_GetError(&hi2c2));
-	  	//__enable_irq();
-	  	if (status == HAL_OK) {
-	  		uint8_t color = rand() % 255;
-	  		setRGB(color, 0, color);
-	  		return true;
-	  	} else if (status == HAL_ERROR) {
-	  		setRGB(255, 0, 20);
-	  	} else if (status == HAL_TIMEOUT) {
-	  		setRGB(0, 0, 20);
-	  	}*/
-	  /*if (success){
-		  printf("True\n");
-		  setRGB(0, 255, 0);
-	  } else {
-		  printf("False\n");
-		  //setRGB(0, 0, 0);
-	  }*/
-	  //printf("%i", nvm_buf);
+    //bool success = stusb4500_nvm_flash(&device, &config);
+    printf("Begin\n");
+    //bool success = stusb4500_set_gpio_state(&device, true);
+    //uint8_t nvm_buf = 10;
+    //bool success = stusb4500_nvm_read(&device, &nvm_buf);
+    //uint8_t buf;
+    /*uint8_t status = HAL_I2C_Mem_Read(&hi2c2, 0x28, 0x2FUL, I2C_MEMADD_SIZE_8BIT, &buf, 1, 1000);
+    printf("%lu", HAL_I2C_GetError(&hi2c2));
+        //__enable_irq();
+        if (status == HAL_OK) {
+            uint8_t color = rand() % 255;
+            setRGB(color, 0, color);
+            return true;
+        } else if (status == HAL_ERROR) {
+            setRGB(255, 0, 20);
+        } else if (status == HAL_TIMEOUT) {
+            setRGB(0, 0, 20);
+        }*/
+    /*if (success){
+        printf("True\n");
+        setRGB(0, 255, 0);
+    } else {
+        printf("False\n");
+        //setRGB(0, 0, 0);
+    }*/
+    //printf("%i", nvm_buf);
 
 
-	  /*if (success) {
-		 setRGB(0, 255, 0);
-	  } else {
-		  setRGB(255, 0, 0);
-	  }*/
-	  while (1) {
-
-	  }
+    /*if (success) {
+       setRGB(0, 255, 0);
+    } else {
+        setRGB(255, 0, 0);
+    }*/
+    while (1) {
+    }
 }
