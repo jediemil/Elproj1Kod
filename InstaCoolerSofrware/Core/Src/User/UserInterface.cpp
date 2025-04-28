@@ -39,14 +39,24 @@ void UserInterface::begin() {
     ssd1306_SetCursor(0, 0);
     ssd1306_WriteString(buffer, Font_11x18, White);
     ssd1306_UpdateScreen();
+
+    continueCall = &UserInterface::setupWelcome;
 }
 
 void UserInterface::drawWelcome() {
-    char word[] = "Välkommen";
+    char line1[] = "Välkommen";
 
     ssd1306_Fill(Black);
     ssd1306_SetCursor(0, 0);
-    ssd1306_WriteString(word, Font_11x18, White);
+    ssd1306_WriteString(line1, Font_7x10, White);
+    char line2[] = "Till InstaCooler";
+    ssd1306_SetCursor(0, 11);
+    ssd1306_WriteString(line2, Font_6x8, White);
+    char line3[] = "Startar";
+    ssd1306_SetCursor(0, 19);
+    ssd1306_WriteString(line3, Font_6x8, White);
+
+    ssd1306_FillRectangle(4, 28, 124, 31, White);
     ssd1306_UpdateScreen();
 }
 
@@ -57,6 +67,9 @@ void UserInterface::drawAutostart() {
 }
 
 void UserInterface::setupWelcome() {
+	continueCall = &UserInterface::setupAutostart;
+
+	currentScreen = &UserInterface::drawWelcome;
 }
 
 void UserInterface::setupInfoScreen() {

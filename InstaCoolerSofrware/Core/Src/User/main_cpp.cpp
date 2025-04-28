@@ -61,7 +61,7 @@ void setLED(uint8_t value, uint32_t timer_channel) {
 void initMotor() {
     TIM_HandleTypeDef *htim = &MOTOR_TIMER_HANDLE;
     setPWM(htim, MOTOR_TIMER_CHANNEL, 0.05); // Initial 1% duty cycle
-    HAL_Delay(6000); // Let motor initialize
+    osDelay(6000); // Let motor initialize
     status.motorInitialized = true;
 }
 
@@ -122,14 +122,14 @@ int main_cpp() {
     	for (int i=0; i<1000;i+=25) {
     			//50% duty cycle
     			setMotorSpeed(i/1000.0);
-    			HAL_Delay(500);
+    			osDelay(500);
     		}
 
     		for (int i=1000; i>0;i-=25) {
     			//50% duty cycle
     			setMotorSpeed(i/1000.0);
-    			 HAL_Delay(500);
+    			osDelay(500);
     		}
-    		HAL_Delay(100);
+    		osDelay(100);
     }
 }

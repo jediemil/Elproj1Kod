@@ -22,6 +22,9 @@ public:
     void rightSwipe();
     void click();
 
+    void cancelEvent();
+    void continueEvent();
+
     void drawScreen();
 
 private:
@@ -49,6 +52,9 @@ private:
     void (UserInterface::*rightCall)();
     void (UserInterface::*clickCall)();
     void (UserInterface::*currentScreen)();
+
+    void (UserInterface::*cancelCall)();
+    void (UserInterface::*continueCall)();
 
     //method_function screens[3] = {&UserInterface::drawWelcome, &UserInterface::drawInfoScreen, &UserInterface::drawAutostart};
     //method_function setups[3] = {&UserInterface::setupWelcome, &UserInterface::setupInfoScreen, &UserInterface::setupAutostart};
