@@ -22,7 +22,7 @@
 
 static Status status;
 static UserInterface userInterface(&status);
-volatile int encoder_counter = 0; //TODO: Varför volatile?
+volatile uint8_t encoder_counter = 0; //TODO: Varför volatile?
 
 void setPWM(TIM_HandleTypeDef *timer_handle, uint32_t timer_channel, float duty) {
     uint32_t counter_period = __HAL_TIM_GET_AUTORELOAD(timer_handle); // Get the ARR value (number of ticks per period)
@@ -60,8 +60,8 @@ void setLED(uint8_t value, uint32_t timer_channel) {
 
 void initMotor() {
     TIM_HandleTypeDef *htim = &MOTOR_TIMER_HANDLE;
-    setPWM(htim, MOTOR_TIMER_CHANNEL, 0.01); // Initial 1% duty cycle
-    HAL_Delay(5000); // Let motor initialize
+    setPWM(htim, MOTOR_TIMER_CHANNEL, 0.05); // Initial 1% duty cycle
+    HAL_Delay(6000); // Let motor initialize
     status.motorInitialized = true;
 }
 
@@ -69,7 +69,7 @@ void setMotorSpeed(float throttle) {
     if (!status.motorInitialized) return;
 
     TIM_HandleTypeDef *htim = &MOTOR_TIMER_HANDLE;
-    float duty = throttle / 100.0f + 0.01f;
+    float duty = throttle*5 / 100.0f + 0.05f;
     setPWM(htim, MOTOR_TIMER_CHANNEL, duty);
     status.setMotorSpeed(throttle);
 }
@@ -106,7 +106,8 @@ bool write_nvm() {
 }
 
 void change_encoder(int change) {
-    encoder_counter += change;
+    encoder_counter += change*10;
+    setRGB(encoder_counter, 0, encoder_counter);
 }
 
 
@@ -118,7 +119,17 @@ int main_cpp() {
 
     setRGB(0, 25, 0);
     while (true) {
-        printf("Working\n");
-        HAL_Delay(1000);
+    	for (int i=0; i<1000;i+=25) {
+    			//50% duty cycle
+    			setMotorSpeed(i/1000.0);
+    			HAL_Delay(500);
+    		}
+
+    		for (int i=1000; i>0;i-=25) {
+    			//50% duty cycle
+    			setMotorSpeed(i/1000.0);
+    			 HAL_Delay(500);
+    		}
+    		HAL_Delay(100);
     }
 }

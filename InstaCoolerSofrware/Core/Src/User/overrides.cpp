@@ -6,16 +6,22 @@
 #include "main_cpp.h"
 #include "stdio.h"
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    if (GPIO_Pin == GPIO_PIN_0) // PE0 or PB0
+void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin) {
+    if (GPIO_Pin == GPIO_PIN_13) // PE0 or PB0
     {
         // Check direction using second pin (you decide which is A and which is B)
-        if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1) == GPIO_PIN_SET) {
+        if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_14) == GPIO_PIN_SET) {
             change_encoder(1); // Clockwise
         } else {
             change_encoder(-1); // Counter-clockwise
         }
-    }
+    } else if(GPIO_Pin == GPIO_PIN_15) {
+    	setRGB(255,0,0);
+    	}
+}
+
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin) {
+
 }
 
 int _write(int file, char *ptr, int len)

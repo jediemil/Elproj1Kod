@@ -89,17 +89,17 @@ void UserInterface::decreaseSelection() {
 }
 
 void UserInterface::drawScreen() {
-    *currentScreen();
+    (this->*currentScreen)();
 }
 
 void UserInterface::click() {
-    *clickCall();
+	(this->*clickCall)();
 }
 
 void UserInterface::rightSwipe() {
-    *rightCall();
+	(this->*rightCall)();
 }
 
 void UserInterface::leftSwipe() {
-    *leftCall();
+	(this->*leftCall)();
 }
