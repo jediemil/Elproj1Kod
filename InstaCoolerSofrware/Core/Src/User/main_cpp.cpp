@@ -17,6 +17,7 @@
 #include "i2c.h"
 #include "tim.h"
 #include "app_freertos.h"
+#include "adc.h"
 
 #include "Status.h"
 #include "include.h"
@@ -47,7 +48,7 @@ const osThreadAttr_t userInterfaceTaskAttributes = {
         .cb_mem=NULL,
         .cb_size=NULL,
         .stack_mem=NULL,
-        .stack_size = 128*4,
+        .stack_size = 128*16,
         .priority = (osPriority_t) osPriorityNormal,
         .tz_module=NULL,
         .reserved=NULL,
@@ -214,6 +215,9 @@ int main_cpp() {
     printf("Startar UI\n");
     userInterface.begin();
     userInterface.setupWelcome();
+
+    //HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
+    HAL_ADC_Start_DMA(&hadc1, status.adcBuf, 4);
 
     printf("Startar tasks\n");
     //osThreadDef(UserInterfaceTask, startUserInterfaceTask, osPriorityNormal, 0, 128);

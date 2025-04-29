@@ -16,18 +16,26 @@ public:
 	void setMotorSpeed(float speed);
     float getMotorSpeed();
     uint16_t getTimeLeft();
+    uint32_t adcBuf[4];
 
 	bool motorInitialized;
     bool programRunning;
     uint8_t programType;
     float programProgress;
 
-    uint64_t programLen;
-    uint16_t startTick;
+    uint16_t programLen;
+    uint64_t startTick;
+
+    float getWaterTemp();
+    float getAirTemp();
+    float convertADCToTemp(uint16_t adcValue);
+    float getADCValue(uint16_t adcChannel);
 
 
 private:
   float motorSpeed;
+
+
 };
 
 #endif /* SRC_USER_STATUS_H_ */

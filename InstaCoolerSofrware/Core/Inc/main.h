@@ -65,6 +65,9 @@ void Error_Handler(void);
 #define ENCODER_BUTTON_Pin GPIO_PIN_15
 #define ENCODER_BUTTON_GPIO_Port GPIOC
 #define ENCODER_BUTTON_EXTI_IRQn EXTI15_IRQn
+#define LID_SENSOR_Pin GPIO_PIN_9
+#define LID_SENSOR_GPIO_Port GPIOB
+#define LID_SENSOR_EXTI_IRQn EXTI9_IRQn
 
 /* USER CODE BEGIN Private defines */
 

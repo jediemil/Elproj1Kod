@@ -69,22 +69,35 @@ void UserInterface::drawInfoScreen() {
     char buffer[40];
     //buffer = std::format("Hello {}!", status->getMotorSpeed()*100);
     __disable_irq();
-    //sprintf(buffer, "Motor speed: %d", (int)(status->getMotorSpeed()*100.0));
-    sprintf(buffer, "Motor speed: d");
+    sprintf(buffer, "Motor speed: %d%%", (int)(status->getMotorSpeed()*100.0 + 0.5));
+    //sprintf(buffer, "Motor speed: d");
     ssd1306_SetCursor(0, 0);
     ssd1306_WriteString(buffer, Font_7x10, White);
     __enable_irq();
 
     __disable_irq();
-    //sprintf(buffer, "Time: %hu s / %hu s", status->getTimeLeft(), status->programLen);
-    sprintf(buffer, "Time: d s / d s");
+    sprintf(buffer, "Time: %hu s / %hu s", status->getTimeLeft(), status->programLen);
+    //sprintf(buffer, "Time: d s / d s");
     ssd1306_SetCursor(0, 11);
     ssd1306_WriteString(buffer, Font_7x10, White);
     __enable_irq();
 
+    __disable_irq();
+    float waterTemp = status->getWaterTemp();
+    //Ligma
+    if (-25.82 >= waterTemp || waterTemp >= 90.0) {
+    	 sprintf(buffer, "Temp: N/A");
+    } else {
+        sprintf(buffer, "Temp: %.1f C", status->getWaterTemp());
+    }
+        //sprintf(buffer, "Time: d s / d s");
+        ssd1306_SetCursor(0, 22);
+        ssd1306_WriteString(buffer, Font_7x10, White);
+        __enable_irq();
+
     float donePercentage = (float)(status->getTimeLeft()) / (float)(status->programLen);
-    ssd1306_DrawRectangle(4, 28, 124, 40, White);
-    ssd1306_FillRectangle(4, 28, 4+(int)(120*donePercentage), 40, White);
+    ssd1306_DrawRectangle(4, 38, 124, 50, White);
+    ssd1306_FillRectangle(4, 38, 4+(int)(120*donePercentage), 50, White);
 
 
     if (selected) {
