@@ -240,7 +240,7 @@ void TIM4_IRQHandler(void)
 void TIM8_UP_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM8_UP_IRQn 0 */
-    addTick();
+  addTick();
   /* USER CODE END TIM8_UP_IRQn 0 */
   HAL_TIM_IRQHandler(&htim8);
   /* USER CODE BEGIN TIM8_UP_IRQn 1 */

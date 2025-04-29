@@ -10,7 +10,7 @@
 uint64_t lastIRQTick = 0;
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin) {
-    if (getTimeTicks() < lastIRQTick + 5) return;
+    //if (getTimeTicks() < lastIRQTick + 5) return;
     lastIRQTick = getTimeTicks();
     if (GPIO_Pin == GPIO_PIN_13) // PE0 or PB0
     {

@@ -68,15 +68,19 @@ void UserInterface::drawInfoScreen() {
 
     char buffer[40];
     //buffer = std::format("Hello {}!", status->getMotorSpeed()*100);
+    __disable_irq();
     //sprintf(buffer, "Motor speed: %d", (int)(status->getMotorSpeed()*100.0));
     sprintf(buffer, "Motor speed: d");
     ssd1306_SetCursor(0, 0);
     ssd1306_WriteString(buffer, Font_7x10, White);
+    __enable_irq();
 
+    __disable_irq();
     //sprintf(buffer, "Time: %hu s / %hu s", status->getTimeLeft(), status->programLen);
     sprintf(buffer, "Time: d s / d s");
     ssd1306_SetCursor(0, 11);
     ssd1306_WriteString(buffer, Font_7x10, White);
+    __enable_irq();
 
     float donePercentage = (float)(status->getTimeLeft()) / (float)(status->programLen);
     ssd1306_DrawRectangle(4, 28, 124, 40, White);
