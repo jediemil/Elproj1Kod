@@ -15,8 +15,16 @@ public:
 	Status();
 	void setMotorSpeed(float speed);
     float getMotorSpeed();
+    uint16_t getTimeLeft();
 
 	bool motorInitialized;
+    bool programRunning;
+    uint8_t programType;
+    float programProgress;
+
+    uint16_t programLen;
+    unsigned long startTick;
+
 
 private:
   float motorSpeed;

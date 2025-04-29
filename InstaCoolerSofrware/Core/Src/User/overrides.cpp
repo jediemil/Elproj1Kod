@@ -5,19 +5,24 @@
 #include <main.h>
 #include "main_cpp.h"
 #include "stdio.h"
+#include "tim.h"
+
+unsigned long lastIRQTick = 0;
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin) {
+    if (getTimeTicks() < lastIRQTick + 5) return;
+    lastIRQTick = getTimeTicks();
     if (GPIO_Pin == GPIO_PIN_13) // PE0 or PB0
     {
         // Check direction using second pin (you decide which is A and which is B)
         if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_14) == GPIO_PIN_SET) {
-            change_encoder(1); // Clockwise
+            changeEncoderIt(1); // Clockwise
         } else {
-            change_encoder(-1); // Counter-clockwise
+            changeEncoderIt(-1); // Counter-clockwise
         }
     } else if(GPIO_Pin == GPIO_PIN_15) {
-    	setRGB(255,0,0);
-    	}
+        buttonPressIt();
+    }
 }
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin) {

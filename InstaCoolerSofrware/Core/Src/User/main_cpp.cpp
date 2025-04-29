@@ -9,12 +9,14 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <algorithm>
 
 #include "stusb4500/stusb4500.h"
 
 #include "main.h"
 #include "i2c.h"
 #include "tim.h"
+#include "app_freertos.h"
 
 #include "Status.h"
 #include "include.h"
@@ -23,6 +25,55 @@
 static Status status;
 static UserInterface userInterface(&status);
 volatile uint8_t encoder_counter = 0; //TODO: Varför volatile?
+unsigned long timeTicks = 0; // 0.01 s
+
+osThreadId_t motorTaskHandle;
+const osThreadAttr_t motorTaskAttributes = {
+        .name = "motorTaskTask",
+        .attr_bits=NULL,
+        .cb_mem=NULL,
+        .cb_size=NULL,
+        .stack_mem=NULL,
+        .stack_size = 128*4,
+        .priority = (osPriority_t) osPriorityNormal,
+        .tz_module=NULL,
+        .reserved=NULL,
+};
+
+osThreadId_t userInterfaceTaskHandle;
+const osThreadAttr_t userInterfaceTaskAttributes = {
+        .name = "userInterfaceTask",
+        .attr_bits=NULL,
+        .cb_mem=NULL,
+        .cb_size=NULL,
+        .stack_mem=NULL,
+        .stack_size = 128*4,
+        .priority = (osPriority_t) osPriorityNormal,
+        .tz_module=NULL,
+        .reserved=NULL,
+};
+
+void addTick() {
+    timeTicks++;
+}
+
+unsigned long getTimeTicks() {
+    return timeTicks;
+}
+
+void buttonPressIt() {
+    userInterface.click();
+}
+
+void changeEncoderIt(int change) {
+    //encoder_counter += change*10;
+    //setRGB(encoder_counter, 0, encoder_counter);
+    if (change > 0) {
+        userInterface.rightSwipe();
+    } else {
+        userInterface.leftSwipe();
+    }
+}
 
 void setPWM(TIM_HandleTypeDef *timer_handle, uint32_t timer_channel, float duty) {
     uint32_t counter_period = __HAL_TIM_GET_AUTORELOAD(timer_handle); // Get the ARR value (number of ticks per period)
@@ -35,16 +86,19 @@ void setBuzzerFrequency(uint32_t frequency) {
     //TODO: SKRIV OM KOD SÅ DNE ÄR RIMLIG OCH VÅR EGEN
     TIM_HandleTypeDef *timer = &BUZZER_TIMER_HANDLE; // Using the timer instance htim3
     uint32_t channel = BUZZER_TIMER_CHANNEL; // Using channel 1
+    if (frequency) {
+        uint32_t timer_clk_freq = HAL_RCC_GetSysClockFreq(); // Get the timer base clock frequency (after APB scaling)
+        uint32_t prescaler = timer->Init.Prescaler; // Get the prescaler value from the timer setup
+        uint32_t tick_freq = timer_clk_freq / (prescaler + 1); // Calculate the actual tick frequency
 
-    uint32_t timer_clk_freq = HAL_RCC_GetSysClockFreq(); // Get the timer base clock frequency (after APB scaling)
-    uint32_t prescaler = timer->Init.Prescaler; // Get the prescaler value from the timer setup
-    uint32_t tick_freq = timer_clk_freq / (prescaler + 1); // Calculate the actual tick frequency
+        uint32_t counter_period = (tick_freq / frequency) - 1;
+        // Calculate the counter period (ARR) based on the desired frequency (ARR = number of ticks per period)
+        __HAL_TIM_SET_AUTORELOAD(timer, counter_period); // Set the ARR value (the counter period)
 
-    uint32_t counter_period = (tick_freq / frequency) - 1;
-    // Calculate the counter period (ARR) based on the desired frequency (ARR = number of ticks per period)
-    __HAL_TIM_SET_AUTORELOAD(timer, counter_period); // Set the ARR value (the counter period)
-
-    setPWM(timer, channel, 0.5);
+        setPWM(timer, channel,0.5);
+    } else {
+        setPWM(timer, channel,0);
+    }
 }
 
 void setRGB(uint8_t r, uint8_t g, uint8_t b) {
@@ -105,31 +159,82 @@ bool write_nvm() {
     return success;
 }
 
-void change_encoder(int change) {
-    encoder_counter += change*10;
-    setRGB(encoder_counter, 0, encoder_counter);
+void startUserInterfaceTask(void *argument) {
+    for (;;) {
+        userInterface.drawScreen();
+        osDelay(500);
+    }
+}
+
+void rampDownMotor(int from) {
+    for (int i = 100; i >= 0; i--) {
+        setMotorSpeed(i/400.0);
+        osDelay(50);
+    }
+}
+
+void startMotorTask(void *argument) {
+    for (;;) {
+        while (!status.programRunning) {
+            osDelay(10);
+        }
+        if (status.programType == PROGRAM_TYPE_AUTO) {
+            status.programProgress = 0;
+            status.startTick = getTimeTicks();
+            for (int i = 0; i < 100; i++) {
+                setMotorSpeed(i / 400.0);
+                osDelay(50);
+                if (!status.programRunning) break;
+            }
+
+            for (uint32_t i = 0; i < std::max((int) status.programLen - 10, 0); i++) {
+                if (!status.programRunning) break;
+                osDelay(1000);
+            }
+
+            rampDownMotor(100);
+        }
+
+        if (status.programRunning) {
+            status.programRunning = false;
+            userInterface.continueEvent();
+        } else {
+            userInterface.continueEvent();
+        }
+        setBuzzerFrequency(1000);
+        osDelay(1000);
+        setBuzzerFrequency(0);
+    }
 }
 
 
 int main_cpp() {
     printf("Booted\n");
     setRGB(20, 20, 0);
-    initMotor();
+    printf("Startar UI\n");
     userInterface.begin();
+    userInterface.setupWelcome();
+
+    printf("Startar tasks\n");
+    //osThreadDef(UserInterfaceTask, startUserInterfaceTask, osPriorityNormal, 0, 128);
+    //userInterfaceTaskHandle = osThreadCreate(osThread(UserInterfaceTask), NULL);
+    userInterfaceTaskHandle = osThreadNew(startUserInterfaceTask, NULL, &userInterfaceTaskAttributes);
+    //osThreadDef(MotorTask, startMotorTask, osPriorityNormal, 0, 128);
+    //motorTaskHandle = osThreadCreate(osThread(MotorTask), NULL);
+    motorTaskHandle = osThreadNew(startMotorTask, NULL, &motorTaskAttributes);
+
+    printf("Startar motor\n");
+    initMotor();
 
     setRGB(0, 25, 0);
-    while (true) {
-    	for (int i=0; i<1000;i+=25) {
-    			//50% duty cycle
-    			setMotorSpeed(i/1000.0);
-    			osDelay(500);
-    		}
+    //osDelay(1000);
+    setBuzzerFrequency(1000);
+    userInterface.continueEvent();
+    osDelay(1000);
+    setBuzzerFrequency(0);
 
-    		for (int i=1000; i>0;i-=25) {
-    			//50% duty cycle
-    			setMotorSpeed(i/1000.0);
-    			osDelay(500);
-    		}
-    		osDelay(100);
+    printf("Startad\n");
+    while (true) {
+        osDelay(100);
     }
 }

@@ -9,8 +9,11 @@ extern "C"
 #include <main.h>
 
 int main_cpp();
-void change_encoder(int change);
 void setRGB(uint8_t r, uint8_t g, uint8_t b);
+unsigned long getTimeTicks();
+void addTick();
+void changeEncoderIt(int change);
+void buttonPressIt();
 
 #ifdef __cplusplus
 }

@@ -27,12 +27,13 @@ public:
 
     void drawScreen();
 
+    void setupWelcome();
+
 private:
     void drawWelcome();
     void drawInfoScreen();
     void drawAutostart();
 
-    void setupWelcome();
     void setupInfoScreen();
     void setupAutostart();
 
@@ -43,10 +44,17 @@ private:
     void increaseSelection();
     void decreaseSelection();
 
+    void runFunctionFromList();
+    void emptyCalls();
+
     bool selected;
-    int selection;
+    uint32_t selection;
+    uint32_t maxSelection;
 
     Status *status;
+
+    void autostart();
+    void endProgram();
 
     void (UserInterface::*leftCall)();
     void (UserInterface::*rightCall)();
@@ -58,6 +66,8 @@ private:
 
     //method_function screens[3] = {&UserInterface::drawWelcome, &UserInterface::drawInfoScreen, &UserInterface::drawAutostart};
     //method_function setups[3] = {&UserInterface::setupWelcome, &UserInterface::setupInfoScreen, &UserInterface::setupAutostart};
+    method_function *functionList;
+    method_function settingsPopupFuncs[2] = {&UserInterface::endProgram, &UserInterface::unselect};
 };
 
 #endif /* SRC_USER_USERINTERFACE_H_ */

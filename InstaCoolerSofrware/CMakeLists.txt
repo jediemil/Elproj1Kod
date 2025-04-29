@@ -49,7 +49,7 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(Core/Inc Drivers/STM32U5xx_HAL_Driver/Inc Drivers/STM32U5xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32U5xx/Include Drivers/CMSIS/Include Core/Inc Drivers/STM32U5xx_HAL_Driver/Inc Drivers/STM32U5xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32U5xx/Include Drivers/CMSIS/Include)
+include_directories(Core/Inc Drivers/STM32U5xx_HAL_Driver/Inc Drivers/STM32U5xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32U5xx/Include Drivers/CMSIS/Include Middlewares/Third_Party/FreeRTOS/Source/include/ Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure/ Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/ Middlewares/Third_Party/CMSIS/RTOS2/Include/ Core/Inc Drivers/STM32U5xx_HAL_Driver/Inc Drivers/STM32U5xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32U5xx/Include Drivers/CMSIS/Include)
 include_directories(
     C:/ST/STM32CubeIDE_1.18.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/arm-none-eabi/include
     C:/ST/STM32CubeIDE_1.18.1/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344/tools/lib/gcc/arm-none-eabi/13.3.1/include
@@ -57,7 +57,7 @@ include_directories(
 
 add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32U575xx -DDEBUG -DUSE_HAL_DRIVER -DSTM32U575xx)
 
-file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "Core/*.*")
+file(GLOB_RECURSE SOURCES "Core/*.*" "Middlewares/*.*" "Drivers/*.*" "Core/*.*")
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32U575CGTX_FLASH.ld)
 
