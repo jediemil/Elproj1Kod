@@ -22,8 +22,8 @@ public:
     uint8_t programType;
     float programProgress;
 
-    uint16_t programLen;
-    unsigned long startTick;
+    uint64_t programLen;
+    uint16_t startTick;
 
 
 private:

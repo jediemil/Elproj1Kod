@@ -10,7 +10,7 @@ extern "C"
 
 int main_cpp();
 void setRGB(uint8_t r, uint8_t g, uint8_t b);
-unsigned long getTimeTicks();
+uint64_t getTimeTicks();
 void addTick();
 void changeEncoderIt(int change);
 void buttonPressIt();

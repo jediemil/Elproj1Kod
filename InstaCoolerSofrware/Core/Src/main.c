@@ -103,6 +103,11 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
+  if (HAL_TIM_Base_Start_IT(&htim8) != HAL_OK)
+    {
+      /* Starting Error */
+      Error_Handler();
+    }
   /* USER CODE END 2 */
 
   /* Init scheduler */

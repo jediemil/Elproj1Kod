@@ -25,7 +25,7 @@
 static Status status;
 static UserInterface userInterface(&status);
 volatile uint8_t encoder_counter = 0; //TODO: Varför volatile?
-unsigned long timeTicks = 0; // 0.01 s
+uint64_t timeTicks = 0; // 0.01 s
 
 osThreadId_t motorTaskHandle;
 const osThreadAttr_t motorTaskAttributes = {
@@ -57,7 +57,7 @@ void addTick() {
     timeTicks++;
 }
 
-unsigned long getTimeTicks() {
+uint64_t getTimeTicks() { // 0.01 s
     return timeTicks;
 }
 
