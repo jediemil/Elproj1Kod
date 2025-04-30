@@ -11,6 +11,7 @@
 #include "include.h"
 #include "main_cpp.h"
 #include "stdio.h"
+#include "bmp.h"
 
 /* UserInterface::UserInterface(Status* status)
     : status(status), selected(false), selection(0),
@@ -48,18 +49,10 @@ void UserInterface::begin() {
 
 void UserInterface::drawWelcome() {
     ssd1306_Fill(Black);
+	ssd1306_DrawBitmap(0, 0, epd_bitmap_WhiteInstaCoolerLogo, 128, 64, White);
 
-    char line1[] = "Welcome\0";
-    ssd1306_SetCursor(0, 0);
-    ssd1306_WriteString(line1, Font_7x10, White);
-    char line2[] = "To InstaCooler\0";
-    ssd1306_SetCursor(0, 11);
-    ssd1306_WriteString(line2, Font_6x8, White);
-    char line3[] = "Starting...\0";
-    ssd1306_SetCursor(0, 19);
-    ssd1306_WriteString(line3, Font_6x8, White);
+    ssd1306_FillRectangle(4, 59, 124, 63, White);
 
-    ssd1306_FillRectangle(4, 28, 124, 31, White);
     ssd1306_UpdateScreen();
 }
 
