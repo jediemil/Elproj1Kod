@@ -14,6 +14,8 @@ uint64_t getTimeTicks();
 void addTick();
 void changeEncoderIt(int change);
 void buttonPressIt();
+void terminateMotorTask();
+void startMotorTask();
 
 #ifdef __cplusplus
 }

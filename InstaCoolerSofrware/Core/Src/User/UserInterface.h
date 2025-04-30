@@ -24,6 +24,7 @@ public:
 
     void cancelEvent();
     void continueEvent();
+    void changeLidStatus();
 
     void drawScreen();
 
@@ -33,6 +34,7 @@ private:
     void drawWelcome();
     void drawInfoScreen();
     void drawAutostart();
+    void drawLidOpen();
 
     void setupInfoScreen();
     void setupAutostart();

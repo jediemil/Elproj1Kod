@@ -122,6 +122,7 @@ void initMotor() {
 
 void setMotorSpeed(float throttle) {
     if (!status.motorInitialized) return;
+	if (!status.motorRunning) throttle = 0;
 
     TIM_HandleTypeDef *htim = &MOTOR_TIMER_HANDLE;
     float duty = throttle*5 / 100.0f + 0.05f;
@@ -176,12 +177,14 @@ void rampDownMotor(int from) {
 
 void startMotorTask(void *argument) {
     for (;;) {
+		setMotorSpeed(0);
         while (!status.programRunning) {
             osDelay(10);
         }
         if (status.programType == PROGRAM_TYPE_AUTO) {
             status.programProgress = 0;
             status.startTick = getTimeTicks();
+			status.motorRunning = true;
             for (int i = 0; i < 100; i++) {
                 setMotorSpeed(i / 400.0);
                 osDelay(50);
@@ -194,6 +197,7 @@ void startMotorTask(void *argument) {
             }
 
             rampDownMotor(100);
+			status.motorRunning = false;
         }
 
         if (status.programRunning) {
@@ -208,6 +212,21 @@ void startMotorTask(void *argument) {
     }
 }
 
+void terminateMotorTask() {
+    osThreadSuspend(motorTaskHandle);
+	setMotorSpeed(0);
+	status.motorRunning = false;
+    status.lidOpen = true;
+	status.programLen = 0;
+	status.programRunning = false;
+    userInterface.changeLidStatus();
+}
+
+void startMotorTask() {
+    status.lidOpen = false;
+	osThreadResume(motorTaskHandle);
+    userInterface.changeLidStatus();
+}
 
 int main_cpp() {
     printf("Booted\n");
@@ -233,12 +252,18 @@ int main_cpp() {
     setRGB(0, 25, 0);
     //osDelay(1000);
     setBuzzerFrequency(1000);
-    userInterface.continueEvent();
+    if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) == GPIO_PIN_SET) {
+        userInterface.continueEvent();
+    } else {
+        terminateMotorTask();
+    }
+
     osDelay(1000);
     setBuzzerFrequency(0);
 
     printf("Startad\n");
     while (true) {
         osDelay(100);
+
     }
 }

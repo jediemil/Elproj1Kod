@@ -22,11 +22,15 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin) {
         }
     } else if(GPIO_Pin == GPIO_PIN_15) {
         buttonPressIt();
+    } else if (GPIO_Pin == LID_SENSOR_Pin) {
+        startMotorTask();
     }
 }
 
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin) {
-
+    if (GPIO_Pin == LID_SENSOR_Pin) {
+        terminateMotorTask();
+    }
 }
 
 int _write(int file, char *ptr, int len)

@@ -22,6 +22,8 @@ public:
     bool programRunning;
     uint8_t programType;
     float programProgress;
+	bool lidOpen;
+	bool motorRunning;
 
     uint16_t programLen;
     uint64_t startTick;

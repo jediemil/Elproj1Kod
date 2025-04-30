@@ -143,6 +143,19 @@ void UserInterface::drawAutostart() {
     ssd1306_UpdateScreen();
 }
 
+void UserInterface::drawLidOpen() {
+    ssd1306_Fill(Black);
+
+    char line1[] = "Lid Open\0";
+    ssd1306_SetCursor(0, 0);
+    ssd1306_WriteString(line1, Font_7x10, White);
+    char line1[] = "Close lid to continue\0";
+    ssd1306_SetCursor(0, 12);
+    ssd1306_WriteString(line1, Font_7x10, White);
+
+    ssd1306_UpdateScreen();
+}
+
 void UserInterface::setupWelcome() {
 	continueCall = &UserInterface::setupAutostart;
 
@@ -181,6 +194,15 @@ void UserInterface::endProgram() {
     emptyCalls();
 
     continueCall = &UserInterface::setupAutostart;
+}
+
+void UserInterface::changeLidStatus() {
+    if (status.lidOpen) {
+        emptyCalls();
+        currentScreen = &UserInterface::drawLidOpen;
+    } else {
+        setupAutostart();
+    }
 }
 
 void UserInterface::emptyCalls() {
