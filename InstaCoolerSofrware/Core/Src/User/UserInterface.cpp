@@ -140,11 +140,12 @@ void UserInterface::drawLidOpen() {
     ssd1306_Fill(Black);
 
     char line1[] = "Lid Open\0";
-    ssd1306_SetCursor(0, 0);
-    ssd1306_WriteString(line1, Font_7x10, White);
-    char line1[] = "Close lid to continue\0";
+    ssd1306_SetCursor(20, 20);
+    ssd1306_WriteString(line1, Font_11x18, White);
+    char line2[] = "Close the lid\0";
+    char line3[] = "to continue\0";
     ssd1306_SetCursor(0, 12);
-    ssd1306_WriteString(line1, Font_7x10, White);
+    ssd1306_WriteString(line2, Font_7x10, White);
 
     ssd1306_UpdateScreen();
 }
@@ -190,7 +191,7 @@ void UserInterface::endProgram() {
 }
 
 void UserInterface::changeLidStatus() {
-    if (status.lidOpen) {
+    if (status->lidOpen) {
         emptyCalls();
         currentScreen = &UserInterface::drawLidOpen;
     } else {

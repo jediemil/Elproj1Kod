@@ -253,9 +253,9 @@ int main_cpp() {
     //osDelay(1000);
     setBuzzerFrequency(1000);
     if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) == GPIO_PIN_SET) {
-        userInterface.continueEvent();
-    } else {
         terminateMotorTask();
+    } else {
+        userInterface.continueEvent();
     }
 
     osDelay(1000);
