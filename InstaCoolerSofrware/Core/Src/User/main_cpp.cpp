@@ -22,6 +22,7 @@
 #include "Status.h"
 #include "include.h"
 #include "UserInterface.h"
+#include "bmp.h"
 
 static Status status;
 static UserInterface userInterface(&status);
@@ -49,6 +50,19 @@ const osThreadAttr_t userInterfaceTaskAttributes = {
         .cb_size=NULL,
         .stack_mem=NULL,
         .stack_size = 128*16,
+        .priority = (osPriority_t) osPriorityNormal,
+        .tz_module=NULL,
+        .reserved=NULL,
+};
+
+osThreadId_t buzzerMusicTaskHandle;
+const osThreadAttr_t buzzerMusicTaskAttributes = {
+        .name = "buzzerMusicTask",
+        .attr_bits=NULL,
+        .cb_mem=NULL,
+        .cb_size=NULL,
+        .stack_mem=NULL,
+        .stack_size = 64,
         .priority = (osPriority_t) osPriorityNormal,
         .tz_module=NULL,
         .reserved=NULL,
@@ -161,6 +175,16 @@ bool write_nvm() {
     return success;
 }
 
+void playBuzzerMusic(void* argument) {
+	uint16_t* ptr = (uint16_t*) argument;
+	while (*ptr != 0) {
+		setBuzzerFrequency((*ptr)>>4);
+		osDelay(((*ptr)&0b1111) * 100);
+		ptr++;
+	}
+	setBuzzerFrequency(0);
+}
+
 void startUserInterfaceTask(void *argument) {
     for (;;) {
         userInterface.drawScreen();
@@ -251,7 +275,8 @@ int main_cpp() {
 
     setRGB(0, 25, 0);
     //osDelay(1000);
-    setBuzzerFrequency(1000);
+    buzzerMusicTaskHandle = osThreadNew(playBuzzerMusic, (void*) windowsStartupStream, &buzzerMusicTaskAttributes);
+    //setBuzzerFrequency(1000);
     if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) == GPIO_PIN_SET) {
         terminateMotorTask();
     } else {
@@ -259,7 +284,7 @@ int main_cpp() {
     }
 
     osDelay(1000);
-    setBuzzerFrequency(0);
+    //setBuzzerFrequency(0);
 
     printf("Startad\n");
     while (true) {
