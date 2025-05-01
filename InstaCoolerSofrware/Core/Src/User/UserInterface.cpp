@@ -244,24 +244,24 @@ void UserInterface::drawCustomProgramSettings() {
 	__disable_irq();
 	sprintf(buffer, "%d S", selectedProgramLen);
 	__enable_irq();
-	drawSettingCell(9, (selection==1)&&!selected, (selection==1)&&selected, line2, buffer);
+	drawSettingCell(9, (selection==1)&&!selected, (selection==0)&&selected, line2, buffer);
 
 	__disable_irq();
 	sprintf(buffer, "%d C", selectedTemperature/100);
 	__enable_irq();
-	drawSettingCell(18, (selection==2)&&!selected, (selection==2)&&selected, line3, buffer);
+	drawSettingCell(18, (selection==2)&&!selected, (selection==1)&&selected, line3, buffer);
 
 	__disable_irq();
 	sprintf(buffer, "%d mL", selectedDrinkSize);
 	__enable_irq();
-	drawSettingCell(27, (selection==3)&&!selected, (selection==3)&&selected, line4, buffer);
+	drawSettingCell(27, (selection==3)&&!selected, (selection==2)&&selected, line4, buffer);
 
 	__disable_irq();
 	sprintf(buffer, "%d %%", selectedMotorSpeed);
 	__enable_irq();
-	drawSettingCell(36, (selection==4)&&!selected, (selection==4)&&selected, line5, buffer);
-	drawSettingCell(45, (selection==5)&&!selected, (selection==5)&&selected, line6, NULL);
-	drawSettingCell(54, (selection==6)&&!selected, (selection==6)&&selected, line7, NULL);
+	drawSettingCell(36, (selection==4)&&!selected, (selection==3)&&selected, line5, buffer);
+	drawSettingCell(45, (selection==5)&&!selected, (selection==4)&&selected, line6, NULL);
+	drawSettingCell(54, (selection==6)&&!selected, (selection==5)&&selected, line7, NULL);
 
 	ssd1306_UpdateScreen();
 }
