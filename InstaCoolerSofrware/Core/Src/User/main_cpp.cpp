@@ -164,7 +164,7 @@ bool write_nvm() {
 void startUserInterfaceTask(void *argument) {
     for (;;) {
         userInterface.drawScreen();
-        osDelay(500);
+        osDelay(200);
     }
 }
 
@@ -181,7 +181,7 @@ void startMotorTask(void *argument) {
         while (!status.programRunning) {
             osDelay(10);
         }
-        if (status.programType == PROGRAM_TYPE_AUTO) {
+        if (status.programType == PROGRAM_TYPE_AUTO || status.programType == PROGRAM_TYPE_CUSTOM) {
             status.programProgress = 0;
             status.startTick = getTimeTicks();
 			status.motorRunning = true;

@@ -25,7 +25,11 @@ public:
 	bool lidOpen;
 	bool motorRunning;
 
+	uint16_t selectedMotorSpeed;
+	uint16_t targetTemp;
+	uint16_t drinkSize;
     uint16_t programLen;
+
     uint64_t startTick;
 
     float getWaterTemp();

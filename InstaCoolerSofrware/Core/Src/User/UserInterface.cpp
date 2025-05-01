@@ -63,17 +63,17 @@ void UserInterface::drawInfoScreen() {
     //buffer = std::format("Hello {}!", status->getMotorSpeed()*100);
     __disable_irq();
     sprintf(buffer, "Motor speed: %d%%", (int)(status->getMotorSpeed()*100.0 + 0.5));
+    __enable_irq();
     //sprintf(buffer, "Motor speed: d");
     ssd1306_SetCursor(0, 0);
     ssd1306_WriteString(buffer, Font_7x10, White);
-    __enable_irq();
 
     __disable_irq();
-    sprintf(buffer, "Time: %hu s / %hu s", status->getTimeLeft(), status->programLen);
+    sprintf(buffer, "Time: %hus / %hus", status->getTimeLeft(), status->programLen);
+    __enable_irq();
     //sprintf(buffer, "Time: d s / d s");
     ssd1306_SetCursor(0, 11);
     ssd1306_WriteString(buffer, Font_7x10, White);
-    __enable_irq();
 
     __disable_irq();
     float waterTemp = status->getWaterTemp();
@@ -144,10 +144,138 @@ void UserInterface::drawLidOpen() {
     ssd1306_WriteString(line1, Font_11x18, White);
     char line2[] = "Close the lid\0";
     char line3[] = "to continue\0";
-    ssd1306_SetCursor(0, 12);
+    ssd1306_SetCursor(0, 39);
     ssd1306_WriteString(line2, Font_7x10, White);
+    ssd1306_SetCursor(0, 51);
+    ssd1306_WriteString(line3, Font_7x10, White);
 
     ssd1306_UpdateScreen();
+}
+
+void UserInterface::drawCustomProgram() {
+	ssd1306_Fill(Black);
+
+	char line1[] = "Click to start\0";
+	ssd1306_SetCursor(0, 0);
+	ssd1306_WriteString(line1, Font_7x10, White);
+	char line2[] = "CUSTOM PROGRA\0";
+	ssd1306_SetCursor(0, 11);
+	ssd1306_WriteString(line2, Font_11x18, White);
+	char line3[] = "M\0";
+	ssd1306_SetCursor(56, 30);
+	ssd1306_WriteString(line3, Font_16x26, White);
+
+	ssd1306_UpdateScreen();
+}
+
+void UserInterface::drawCredits() {
+	ssd1306_Fill(Black);
+	char line1[] = "InstaCooler\0";
+	char line2[] = "Erik 'HEj' Nydahl\0";
+	char line3[] = "Charlie 'Gay' Sandvall\0";
+	char line4[] = "Jorm 'cool' Akerberg\0";
+	char line5[] = "Karl 'boomer' Stenberg\0";
+	char line6[] = "Emil 'Reyier' Hedin\0";
+
+	ssd1306_SetCursor(3, 0);
+	ssd1306_WriteString(line1, Font_11x18, White);
+	ssd1306_SetCursor(13, 19);
+	ssd1306_WriteString(line2, Font_6x8, White);
+	ssd1306_SetCursor(2, 28);
+	ssd1306_WriteString(line3, Font_6x8, White);
+	ssd1306_SetCursor(4, 37);
+	ssd1306_WriteString(line4, Font_6x8, White);
+	ssd1306_SetCursor(2, 46);
+	ssd1306_WriteString(line5, Font_6x8, White);
+	ssd1306_SetCursor(7, 55);
+	ssd1306_WriteString(line6, Font_6x8, White);
+
+	ssd1306_UpdateScreen();
+}
+
+void UserInterface::drawCustomProgramSettings() {
+	ssd1306_Fill(Black);
+	selection = (selection + 6) % 6;
+
+	if (selected) {
+		clickCall = &UserInterface::unselect;
+		if (selection <= 3) {
+			leftCall = &UserInterface::decreaseVariable;
+			rightCall = &UserInterface::increaseVariable;
+		} else if (selection == 4) {
+			selected = false;
+			selection = 0;
+			startProgram();
+		} else if (selection == 5) {
+			selected = false;
+			selection = 0;
+			setupCustomProgram();
+		}
+	} else {
+		clickCall = &UserInterface::select;
+		leftCall = &UserInterface::decreaseSelection;
+		rightCall = &UserInterface::increaseSelection;
+	}
+
+	char line1[] = "Custom settings\0";
+	char line2[] = "Time\0";
+	char line3[] = "Goal temp\0";
+	char line4[] = "Motor speed\0";
+	char line5[] = "Drink size\0";
+	char line6[] = "Start Program\0";
+	char line7[] = "Cancel\0";
+
+	ssd1306_SetCursor(0, 0);
+	ssd1306_WriteString(line1, Font_6x8, White);
+	/*ssd1306_SetCursor(0, 9);
+	ssd1306_WriteString(line2, Font_6x8, White);
+	ssd1306_SetCursor(0, 18);
+	ssd1306_WriteString(line3, Font_6x8, White);
+	ssd1306_SetCursor(0, 27);
+	ssd1306_WriteString(line4, Font_6x8, White);
+	ssd1306_SetCursor(0, 36);
+	ssd1306_WriteString(line5, Font_6x8, White);
+	ssd1306_SetCursor(0, 45);
+	ssd1306_WriteString(line6, Font_6x8, White);
+	ssd1306_SetCursor(0, 54);
+	ssd1306_WriteString(line7, Font_6x8, White);*/
+
+	char buffer[10];
+	__disable_irq();
+	sprintf(buffer, "%d S", selectedProgramLen);
+	__enable_irq();
+	drawSettingCell(9, (selection==1)&&!selected, (selection==1)&&selected, line2, buffer);
+
+	__disable_irq();
+	sprintf(buffer, "%d C", selectedTemperature/100);
+	__enable_irq();
+	drawSettingCell(18, (selection==2)&&!selected, (selection==2)&&selected, line3, buffer);
+
+	__disable_irq();
+	sprintf(buffer, "%d mL", selectedDrinkSize);
+	__enable_irq();
+	drawSettingCell(27, (selection==3)&&!selected, (selection==3)&&selected, line4, buffer);
+
+	__disable_irq();
+	sprintf(buffer, "%d %%", selectedMotorSpeed);
+	__enable_irq();
+	drawSettingCell(36, (selection==4)&&!selected, (selection==4)&&selected, line5, buffer);
+	drawSettingCell(45, (selection==5)&&!selected, (selection==5)&&selected, line6, NULL);
+	drawSettingCell(54, (selection==6)&&!selected, (selection==6)&&selected, line7, NULL);
+}
+
+void UserInterface::drawSettingCell(uint8_t y, bool highlighted, bool selected, char* text, char* value) {
+	if (highlighted) {
+	    ssd1306_FillRectangle(0, y, 100, y+8, White);
+	}
+	ssd1306_SetCursor(0, y);
+	ssd1306_WriteString(text, Font_6x8, (SSD1306_COLOR)!highlighted);
+
+	if (highlighted) {
+		    ssd1306_FillRectangle(101, y, 128, y+8, White);
+	}
+	ssd1306_SetCursor(121, y);
+	ssd1306_WriteString(value, Font_6x8, (SSD1306_COLOR)!selected);
 }
 
 void UserInterface::setupWelcome() {
@@ -164,14 +292,43 @@ void UserInterface::setupInfoScreen() {
     leftCall = &UserInterface::decreaseSelection;
     rightCall = &UserInterface::increaseSelection;
 
+    selected = false;
+    selection = 0;
+
     currentScreen = &UserInterface::drawInfoScreen;
 }
 
 void UserInterface::setupAutostart() {
 
     clickCall = &UserInterface::autostart;
-
+    leftCall = &UserInterface::setupCredits;
+    rightCall = &UserInterface::setupCustomProgram;
     currentScreen = &UserInterface::drawAutostart;
+}
+
+void UserInterface::setupCredits() {
+    emptyCalls();
+    leftCall = &UserInterface::setupCustomProgram;
+    rightCall = &UserInterface::setupAutostart;
+    currentScreen = &UserInterface::drawCredits;
+}
+
+void UserInterface::setupCustomProgram() {
+    emptyCalls();
+    leftCall = &UserInterface::setupAutostart;
+    rightCall = &UserInterface::setupCredits;
+    clickCall = &UserInterface::setupCustomProgramSettings;
+    currentScreen = &UserInterface::drawCustomProgram;
+}
+
+void UserInterface::setupCustomProgramSettings() {
+    emptyCalls();
+    clickCall = &UserInterface::select;
+    leftCall = &UserInterface::decreaseSelection;
+    rightCall = &UserInterface::increaseSelection;
+    selected = false;
+    selection = 0;
+    currentScreen = &UserInterface::drawCustomProgramSettings;
 }
 
 void UserInterface::autostart() {
@@ -180,6 +337,17 @@ void UserInterface::autostart() {
     status->programRunning = true;
 
     setupInfoScreen();
+}
+
+void UserInterface::startProgram() {
+	status->programType = PROGRAM_TYPE_AUTO;
+	status->programLen = selectedProgramLen;
+	status->selectedMotorSpeed = selectedMotorSpeed;
+	status->targetTemp = selectedTemperature;
+	status->drinkSize = selectedDrinkSize;
+	status->programRunning = true;
+
+	 setupInfoScreen();
 }
 
 void UserInterface::endProgram() {
@@ -229,6 +397,15 @@ void UserInterface::decreaseSelection() {
     selection--;
     selection %= maxSelection;
 }
+
+void UserInterface::increaseVariable() {
+	(*variableSelection[selection])++;
+}
+
+void UserInterface::decreaseVariable() {
+	(*variableSelection[selection])--;
+}
+
 
 void UserInterface::drawScreen() {
     (this->*currentScreen)();

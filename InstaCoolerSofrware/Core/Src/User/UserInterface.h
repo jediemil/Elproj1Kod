@@ -35,9 +35,15 @@ private:
     void drawInfoScreen();
     void drawAutostart();
     void drawLidOpen();
+    void drawCustomProgram();
+    void drawCredits();
+    void drawCustomProgramSettings();
 
     void setupInfoScreen();
     void setupAutostart();
+    void setupCustomProgram();
+    void setupCredits();
+    void setupCustomProgramSettings();
 
     void none();
     void select();
@@ -45,17 +51,29 @@ private:
     void toggleSelect();
     void increaseSelection();
     void decreaseSelection();
+    void increaseVariable();
+    void decreaseVariable();
 
     void runFunctionFromList();
     void emptyCalls();
 
+    void drawSettingCell(uint8_t y, bool highlighted, bool selected, char* text, char* value);
+
     bool selected;
-    uint32_t selection;
-    uint32_t maxSelection;
+    uint16_t selection;
+    uint16_t maxSelection;
+
+    uint16_t selectedProgramLen;
+    uint16_t selectedTemperature;
+    uint16_t selectedDrinkSize;
+    uint16_t selectedMotorSpeed;
+
+    uint16_t* variableSelection[4] = {&selectedProgramLen, &selectedTemperature, &selectedDrinkSize, &selectedMotorSpeed};
 
     Status *status;
 
     void autostart();
+    void startProgram();
     void endProgram();
 
     void (UserInterface::*leftCall)();
