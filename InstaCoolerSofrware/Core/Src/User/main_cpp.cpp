@@ -178,11 +178,15 @@ bool write_nvm() {
 void playBuzzerMusic(void* argument) {
 	uint16_t* ptr = (uint16_t*) argument;
 	while (*ptr != 0) {
-		setBuzzerFrequency((*ptr)>>4);
-		osDelay(((*ptr)&0b1111) * 100);
+		uint16_t value = *ptr;
+		uint16_t freq = value >> 4;
+		uint16_t delay = ((*ptr)&0b1111) * 100;
+		setBuzzerFrequency(freq);
+		osDelay(delay);
 		ptr++;
 	}
 	setBuzzerFrequency(0);
+	osThreadExit();
 }
 
 void startUserInterfaceTask(void *argument) {
