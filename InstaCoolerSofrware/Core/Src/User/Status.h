@@ -25,10 +25,10 @@ public:
 	bool lidOpen;
 	bool motorRunning;
 
-	uint16_t selectedMotorSpeed;
-	uint16_t targetTemp;
-	uint16_t drinkSize;
-    uint16_t programLen;
+	float selectedMotorSpeed; // 0-1
+	float targetTemp; // degree C
+	uint16_t drinkSize; // mL
+    uint16_t programLen; //seconds
 
     uint64_t startTick;
 

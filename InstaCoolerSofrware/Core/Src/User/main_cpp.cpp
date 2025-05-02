@@ -197,9 +197,9 @@ void startUserInterfaceTask(void *argument) {
 }
 
 void rampDownMotor(int from) {
-    for (int i = 100; i >= 0; i--) {
-        setMotorSpeed(i/400.0);
-        osDelay(50);
+    for (int i = 1000; i >= 0; i--) {
+        setMotorSpeed(i/10000.0);
+        osDelay(15);
     }
 }
 
@@ -213,18 +213,18 @@ void startMotorTask(void *argument) {
             status.programProgress = 0;
             status.startTick = getTimeTicks();
 			status.motorRunning = true;
-            for (int i = 0; i < 100; i++) {
-                setMotorSpeed(i / 400.0);
-                osDelay(50);
+            for (int i = 0; i < 1000; i++) {
+                setMotorSpeed(i / 10000.0);
+                osDelay(15);
                 if (!status.programRunning) break;
             }
 
-            for (uint32_t i = 0; i < std::max((int) status.programLen - 10, 0); i++) {
+            for (uint32_t i = 0; i < std::max((int) status.programLen - 30, 0); i++) {
                 if (!status.programRunning) break;
                 osDelay(1000);
             }
 
-            rampDownMotor(100);
+            rampDownMotor(1000);
 			status.motorRunning = false;
         }
 

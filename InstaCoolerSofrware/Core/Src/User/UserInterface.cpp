@@ -32,6 +32,11 @@ UserInterface::UserInterface(Status *status) {
 
     selected = false;
     selection = 0;
+
+    selectedProgramLen = 120/5;
+    selectedTemperature = 100;
+    selectedDrinkSize = 33;
+    selectedMotorSpeed = 10;
 }
 
 void UserInterface::begin() {
@@ -171,11 +176,11 @@ void UserInterface::drawCustomProgram() {
 void UserInterface::drawCredits() {
 	ssd1306_Fill(Black);
 	char line1[] = "InstaCooler\0";
-	char line2[] = "Erik 'HEj' Nydahl\0";
-	char line3[] = "Charlie 'Gay' Sandvall\0";
-	char line4[] = "Jorm 'cool' Akerberg\0";
-	char line5[] = "Karl 'boomer' Stenberg\0";
-	char line6[] = "Emil 'Reyier' Hedin\0";
+	char line2[] = "Erik Nydahl\0";
+	char line3[] = "Charlie Sandvall\0";
+	char line4[] = "Jorm Akerberg\0";
+	char line5[] = "Karl Stenberg\0";
+	char line6[] = "Emil Reyier Hedin\0";
 
 	ssd1306_SetCursor(3, 0);
 	ssd1306_WriteString(line1, Font_11x18, White);
@@ -196,6 +201,11 @@ void UserInterface::drawCredits() {
 void UserInterface::drawCustomProgramSettings() {
 	ssd1306_Fill(Black);
 	selection = (selection + 6) % 6;
+
+	selectedProgramLen = std::max(std::min(selectedProgramLen, 60), 6);
+	selectedTemperature = std::max(std::min(selectedTemperature, 200), 60);
+	selectedDrinkSize = std::max(std::min(selectedDrinkSize, 100), 7);
+	selectedMotorSpeed = std::max(std::min(selectedMotorSpeed, 50), 1);
 
 	if (selected) {
 		clickCall = &UserInterface::unselect;
@@ -242,17 +252,17 @@ void UserInterface::drawCustomProgramSettings() {
 
 	char buffer[10];
 	__disable_irq();
-	sprintf(buffer, "%d S", selectedProgramLen);
+	sprintf(buffer, "%d S", selectedProgramLen*5);
 	__enable_irq();
 	drawSettingCell(9, (selection==0)&&!selected, (selection==0)&&selected, line2, buffer);
 
 	__disable_irq();
-	sprintf(buffer, "%d C", selectedTemperature/100);
+	sprintf(buffer, "%.1f C", selectedTemperature/10.0);
 	__enable_irq();
 	drawSettingCell(18, (selection==1)&&!selected, (selection==1)&&selected, line3, buffer);
 
 	__disable_irq();
-	sprintf(buffer, "%d mL", selectedDrinkSize);
+	sprintf(buffer, "%d cL", selectedDrinkSize);
 	__enable_irq();
 	drawSettingCell(27, (selection==2)&&!selected, (selection==2)&&selected, line4, buffer);
 
@@ -346,10 +356,10 @@ void UserInterface::autostart() {
 
 void UserInterface::startProgram() {
 	status->programType = PROGRAM_TYPE_AUTO;
-	status->programLen = selectedProgramLen;
-	status->selectedMotorSpeed = selectedMotorSpeed;
-	status->targetTemp = selectedTemperature;
-	status->drinkSize = selectedDrinkSize;
+	status->programLen = selectedProgramLen*5;
+	status->selectedMotorSpeed = selectedMotorSpeed/100.0;
+	status->targetTemp = selectedTemperature/10.0;
+	status->drinkSize = selectedDrinkSize*10; //cL -> mL
 	status->programRunning = true;
 
 	 setupInfoScreen();
