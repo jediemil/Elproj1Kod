@@ -15,7 +15,7 @@ void addTick();
 void changeEncoderIt(int change);
 void buttonPressIt();
 void terminateMotorTask();
-void startMotorTask();
+void restartMotorTask();
 
 #ifdef __cplusplus
 }

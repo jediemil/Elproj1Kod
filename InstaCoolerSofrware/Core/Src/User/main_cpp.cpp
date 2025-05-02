@@ -197,9 +197,9 @@ void startUserInterfaceTask(void *argument) {
 }
 
 void rampDownMotor(int from) {
-    for (int i = 1000; i >= 0; i--) {
-        setMotorSpeed(i/10000.0);
-        osDelay(15);
+    for (int i = 150; i >= 40; i--) {
+        setMotorSpeed(i/1000.0);
+        osDelay(30);
     }
 }
 
@@ -213,13 +213,13 @@ void startMotorTask(void *argument) {
             status.programProgress = 0;
             status.startTick = getTimeTicks();
 			status.motorRunning = true;
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 400; i < 1500; i++) {
                 setMotorSpeed(i / 10000.0);
                 osDelay(15);
                 if (!status.programRunning) break;
             }
 
-            for (uint32_t i = 0; i < std::max((int) status.programLen - 30, 0); i++) {
+            for (uint32_t i = 0; i < std::max((int) status.programLen - 14, 0); i++) {
                 if (!status.programRunning) break;
                 osDelay(1000);
             }
@@ -250,7 +250,7 @@ void terminateMotorTask() {
     userInterface.changeLidStatus();
 }
 
-void startMotorTask() {
+void restartMotorTask() {
     status.lidOpen = false;
 	osThreadResume(motorTaskHandle);
     userInterface.changeLidStatus();
@@ -282,17 +282,23 @@ int main_cpp() {
     buzzerMusicTaskHandle = osThreadNew(playBuzzerMusic, (void*) windowsStartupStream, &buzzerMusicTaskAttributes);
     //setBuzzerFrequency(1000);
     if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) == GPIO_PIN_SET) {
-        terminateMotorTask();
-    } else {
-        userInterface.continueEvent();
+    	terminateMotorTask();
+    	while (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) == GPIO_PIN_SET) {
+    	        osDelay(100);
+    	    }
     }
 
+    userInterface.continueEvent();
     osDelay(1000);
     //setBuzzerFrequency(0);
 
     printf("Startad\n");
     while (true) {
         osDelay(100);
-
+        /*if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) == GPIO_PIN_SET && osThreadGetState(motorTaskHandle) == osThreadRunning) {
+            terminateMotorTask();
+        } else if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) != GPIO_PIN_SET && osThreadGetState(motorTaskHandle) != osThreadRunning) {
+            restartMotorTask();
+        }*/
     }
 }

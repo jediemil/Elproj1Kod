@@ -10,7 +10,7 @@
 uint64_t lastIRQTick = 0;
 
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin) {
-    if (getTimeTicks() < lastIRQTick + 10) return;
+    if (getTimeTicks() < lastIRQTick + 10 && GPIO_Pin != LID_SENSOR_Pin) return;
     lastIRQTick = getTimeTicks();
     if (GPIO_Pin == GPIO_PIN_13) // PE0 or PB0
     {
@@ -23,7 +23,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin) {
     } else if(GPIO_Pin == GPIO_PIN_15) {
         buttonPressIt();
     } else if (GPIO_Pin == LID_SENSOR_Pin) {
-        startMotorTask();
+        restartMotorTask();
     }
 }
 

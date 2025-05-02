@@ -12,6 +12,7 @@
 #include "main_cpp.h"
 #include "stdio.h"
 #include "bmp.h"
+#include <algorithm>
 
 /* UserInterface::UserInterface(Status* status)
     : status(status), selected(false), selection(0),
@@ -202,10 +203,10 @@ void UserInterface::drawCustomProgramSettings() {
 	ssd1306_Fill(Black);
 	selection = (selection + 6) % 6;
 
-	selectedProgramLen = std::max(std::min(selectedProgramLen, 60), 6);
-	selectedTemperature = std::max(std::min(selectedTemperature, 200), 60);
-	selectedDrinkSize = std::max(std::min(selectedDrinkSize, 100), 7);
-	selectedMotorSpeed = std::max(std::min(selectedMotorSpeed, 50), 1);
+	selectedProgramLen = std::max(std::min((int)selectedProgramLen, 60), 6);
+	selectedTemperature = std::max(std::min((int)selectedTemperature, 200), 60);
+	selectedDrinkSize = std::max(std::min((int)selectedDrinkSize, 100), 7);
+	selectedMotorSpeed = std::max(std::min((int)selectedMotorSpeed, 50), 1);
 
 	if (selected) {
 		clickCall = &UserInterface::unselect;
