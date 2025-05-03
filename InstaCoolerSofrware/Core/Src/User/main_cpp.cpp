@@ -62,7 +62,7 @@ const osThreadAttr_t buzzerMusicTaskAttributes = {
         .cb_mem=NULL,
         .cb_size=NULL,
         .stack_mem=NULL,
-        .stack_size = 1024,
+        .stack_size = 1024*1,
         .priority = (osPriority_t) osPriorityNormal,
         .tz_module=NULL,
         .reserved=NULL,
@@ -93,13 +93,15 @@ void changeEncoderIt(int change) {
 void setPWM(TIM_HandleTypeDef *timer_handle, uint32_t timer_channel, float duty) {
     uint32_t counter_period = __HAL_TIM_GET_AUTORELOAD(timer_handle); // Get the ARR value (number of ticks per period)
     uint32_t new_duty = duty * counter_period; // Calculate new duty value
+    __HAL_TIM_DISABLE(timer_handle);
     __HAL_TIM_SET_COMPARE(timer_handle, timer_channel, new_duty); // Set compare value to new duty
+    __HAL_TIM_ENABLE(timer_handle);
     HAL_TIM_PWM_Start(timer_handle, timer_channel); // Start PWM
 }
 
 void setBuzzerFrequency(uint32_t frequency) {
     //TODO: SKRIV OM KOD SÅ DNE ÄR RIMLIG OCH VÅR EGEN
-    TIM_HandleTypeDef *timer = &BUZZER_TIMER_HANDLE; // Using the timer instance htim3
+    /*TIM_HandleTypeDef *timer = &BUZZER_TIMER_HANDLE; // Using the timer instance htim3
     uint32_t channel = BUZZER_TIMER_CHANNEL; // Using channel 1
     if (frequency) {
         uint32_t timer_clk_freq = HAL_RCC_GetSysClockFreq(); // Get the timer base clock frequency (after APB scaling)
@@ -108,12 +110,37 @@ void setBuzzerFrequency(uint32_t frequency) {
 
         uint32_t counter_period = (tick_freq / frequency) - 1;
         // Calculate the counter period (ARR) based on the desired frequency (ARR = number of ticks per period)
-        __HAL_TIM_SET_AUTORELOAD(timer, counter_period); // Set the ARR value (the counter period)
+        __HAL_TIM_DISABLE(timer);
+        __HAL_TIM_SET_AUTORELOAD(timer, counter_period);
+        __HAL_TIM_ENABLE(timer);
 
         setPWM(timer, channel,0.5);
     } else {
         setPWM(timer, channel,0);
-    }
+        //setRGB(255,0,0);
+    }*/
+	TIM_HandleTypeDef *timer = &BUZZER_TIMER_HANDLE;
+	uint32_t channel = BUZZER_TIMER_CHANNEL;
+
+	if (frequency) {
+	    uint32_t timer_clk_freq = HAL_RCC_GetSysClockFreq();
+	    uint32_t prescaler = timer->Instance->PSC + 1; // safer
+	    uint32_t tick_freq = timer_clk_freq / prescaler;
+
+	    if (frequency > 0 && frequency < 20000) {
+	        uint32_t counter_period = (tick_freq / frequency) - 1;
+
+	        __HAL_TIM_DISABLE(timer);
+	        __HAL_TIM_SET_AUTORELOAD(timer, counter_period);
+	        __HAL_TIM_SET_COMPARE(timer, channel, counter_period / 2);
+	        __HAL_TIM_ENABLE(timer);
+
+	        HAL_TIM_PWM_Start(timer, channel);
+	    }
+	} else {
+	    __HAL_TIM_SET_COMPARE(timer, channel, 0);
+	    HAL_TIM_PWM_Stop(timer, channel);
+	}
 }
 
 void setRGB(uint8_t r, uint8_t g, uint8_t b) {
@@ -137,6 +164,7 @@ void initMotor() {
 void setMotorSpeed(float throttle) {
     if (!status.motorInitialized) return;
 	if (!status.motorRunning) throttle = 0;
+	if (status.lidOpen) throttle = 0;
 
     TIM_HandleTypeDef *htim = &MOTOR_TIMER_HANDLE;
     float duty = throttle*5 / 100.0f + 0.05f;
@@ -180,12 +208,17 @@ void playBuzzerMusic(void* argument) {
 	while (*ptr != 0) {
 		uint16_t value = *ptr;
 		uint16_t freq = value >> 4;
-		uint16_t delay = ((*ptr)&0b1111) * 100;
+		uint16_t delay = ((*ptr)&0b1111) * 50;
+
 		setBuzzerFrequency(freq);
+		osDelay(1); // Let the buzzer hardware settle (optional, but helps)
 		osDelay(delay);
+		setBuzzerFrequency(0); // Stop tone between notes
+		osDelay(10); // Short pause between notes
 		ptr++;
 	}
 	setBuzzerFrequency(0);
+	//setRGB(255,0,255);
 	osThreadExit();
 }
 
@@ -196,10 +229,11 @@ void startUserInterfaceTask(void *argument) {
     }
 }
 
-void rampDownMotor(int from) {
-    for (int i = 150; i >= 40; i--) {
-        setMotorSpeed(i/1000.0);
-        osDelay(30);
+void rampDownMotor(float from) {
+    for (int i = (int)(from*1000.0); i >= 40; i-=1) {
+    	if (!status.motorRunning) break;
+        setMotorSpeed(i / 1000.0);
+        osDelay(50);
     }
 }
 
@@ -210,30 +244,33 @@ void startMotorTask(void *argument) {
             osDelay(10);
         }
         if (status.programType == PROGRAM_TYPE_AUTO || status.programType == PROGRAM_TYPE_CUSTOM) {
+        	float motorSpeed = status.selectedMotorSpeed;
+        	if (status.programType == PROGRAM_TYPE_AUTO) {
+        		motorSpeed = 0.1;
+        	}
             status.programProgress = 0;
             status.startTick = getTimeTicks();
 			status.motorRunning = true;
-            for (int i = 400; i < 1500; i++) {
+            for (int i = 400; i < (int)(motorSpeed*10000.0); i++) {
                 setMotorSpeed(i / 10000.0);
                 osDelay(15);
                 if (!status.programRunning) break;
             }
 
-            for (uint32_t i = 0; i < std::max((int) status.programLen - 14, 0); i++) {
+            for (uint32_t i = 0; i < std::max((int) status.programLen - 15, 0); i++) {
                 if (!status.programRunning) break;
                 osDelay(1000);
             }
 
-            rampDownMotor(1000);
+            rampDownMotor(motorSpeed);
+            setMotorSpeed(0);
 			status.motorRunning = false;
         }
 
-        if (status.programRunning) {
-            status.programRunning = false;
-            userInterface.continueEvent();
-        } else {
-            userInterface.continueEvent();
+        if (!status.lidOpen) {
+        	userInterface.setupAutostart();
         }
+        status.programRunning = false;
         setBuzzerFrequency(1000);
         osDelay(1000);
         setBuzzerFrequency(0);
@@ -241,18 +278,17 @@ void startMotorTask(void *argument) {
 }
 
 void terminateMotorTask() {
-    osThreadSuspend(motorTaskHandle);
-	setMotorSpeed(0);
 	status.motorRunning = false;
+	setMotorSpeed(0);
     status.lidOpen = true;
 	status.programLen = 0;
 	status.programRunning = false;
+	status.programType = 0;
     userInterface.changeLidStatus();
 }
 
 void restartMotorTask() {
     status.lidOpen = false;
-	osThreadResume(motorTaskHandle);
     userInterface.changeLidStatus();
 }
 
@@ -280,24 +316,25 @@ int main_cpp() {
     setRGB(0, 25, 0);
     //osDelay(1000);
     buzzerMusicTaskHandle = osThreadNew(playBuzzerMusic, (void*) windowsStartupStream, &buzzerMusicTaskAttributes);
+    //playBuzzerMusic((void*) windowsStartupStream);
     //setBuzzerFrequency(1000);
     if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) == GPIO_PIN_SET) {
     	terminateMotorTask();
     	while (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) == GPIO_PIN_SET) {
-    	        osDelay(100);
-    	    }
+    		osDelay(100);
+    	}
     }
 
-    userInterface.continueEvent();
+    userInterface.setupAutostart();
     osDelay(1000);
     //setBuzzerFrequency(0);
 
     printf("Startad\n");
     while (true) {
         osDelay(100);
-        /*if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) == GPIO_PIN_SET && osThreadGetState(motorTaskHandle) == osThreadRunning) {
+        /*if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) == GPIO_PIN_SET && status.lidOpen == false) {
             terminateMotorTask();
-        } else if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) != GPIO_PIN_SET && osThreadGetState(motorTaskHandle) != osThreadRunning) {
+        } else if (HAL_GPIO_ReadPin(GPIOB, LID_SENSOR_Pin) != GPIO_PIN_SET && status.lidOpen == true) {
             restartMotorTask();
         }*/
     }

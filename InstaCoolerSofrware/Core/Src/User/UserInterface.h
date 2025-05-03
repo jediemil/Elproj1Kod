@@ -29,6 +29,7 @@ public:
     void drawScreen();
 
     void setupWelcome();
+    void setupAutostart();
 
 private:
     void drawWelcome();
@@ -40,7 +41,6 @@ private:
     void drawCustomProgramSettings();
 
     void setupInfoScreen();
-    void setupAutostart();
     void setupCustomProgram();
     void setupCredits();
     void setupCustomProgramSettings();

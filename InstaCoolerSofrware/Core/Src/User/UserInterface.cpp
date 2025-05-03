@@ -30,9 +30,12 @@ UserInterface::UserInterface(Status *status) {
     rightCall = &UserInterface::none;
     clickCall = &UserInterface::none;
     currentScreen = &UserInterface::none;
+    continueCall = &UserInterface::none;
+    cancelCall = &UserInterface::none;
 
     selected = false;
     selection = 0;
+    maxSelection = 2;
 
     selectedProgramLen = 120/5;
     selectedTemperature = 100;
@@ -206,7 +209,7 @@ void UserInterface::drawCustomProgramSettings() {
 	selectedProgramLen = std::max(std::min((int)selectedProgramLen, 60), 6);
 	selectedTemperature = std::max(std::min((int)selectedTemperature, 200), 60);
 	selectedDrinkSize = std::max(std::min((int)selectedDrinkSize, 100), 7);
-	selectedMotorSpeed = std::max(std::min((int)selectedMotorSpeed, 50), 1);
+	selectedMotorSpeed = std::max(std::min((int)selectedMotorSpeed, 50), 4);
 
 	if (selected) {
 		clickCall = &UserInterface::unselect;
@@ -356,14 +359,14 @@ void UserInterface::autostart() {
 }
 
 void UserInterface::startProgram() {
-	status->programType = PROGRAM_TYPE_AUTO;
+	status->programType = PROGRAM_TYPE_CUSTOM;
 	status->programLen = selectedProgramLen*5;
 	status->selectedMotorSpeed = selectedMotorSpeed/100.0;
 	status->targetTemp = selectedTemperature/10.0;
 	status->drinkSize = selectedDrinkSize*10; //cL -> mL
 	status->programRunning = true;
 
-	 setupInfoScreen();
+	setupInfoScreen();
 }
 
 void UserInterface::endProgram() {

@@ -73,7 +73,7 @@ const unsigned char epd_bitmap_WhiteInstaCoolerLogo [] = {
 
 
 const uint16_t windowsStartupStream [] = { //12 freq (0-4095 Hz) 4 bits delay (0-15). delay * 100 (0-1500 ms)
-		(622<<4) + 10, (311<<4) + 3, (466<<4) + 5, (415<<4) + 1, (622<<4) + 5, (466<<4) + 15, 0
+		(622<<4) + 10, (311<<4) + 3, (466<<4) + 5, (415<<4) + 2, (622<<4) + 5, (466<<4) + 15, 0
 };
 
 #endif //BMP_H
