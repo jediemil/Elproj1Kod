@@ -39,11 +39,13 @@ private:
     void drawCustomProgram();
     void drawCredits();
     void drawCustomProgramSettings();
+    void drawCreditsSelection();
 
     void setupInfoScreen();
     void setupCustomProgram();
     void setupCredits();
     void setupCustomProgramSettings();
+    void setupCreditsSelection();
 
     void none();
     void select();

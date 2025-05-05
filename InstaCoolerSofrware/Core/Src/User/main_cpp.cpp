@@ -129,13 +129,15 @@ void setBuzzerFrequency(uint32_t frequency) {
 
 	    if (frequency > 0 && frequency < 20000) {
 	        uint32_t counter_period = (tick_freq / frequency) - 1;
-
+	        __disable_irq();
 	        __HAL_TIM_DISABLE(timer);
 	        __HAL_TIM_SET_AUTORELOAD(timer, counter_period);
 	        __HAL_TIM_SET_COMPARE(timer, channel, counter_period / 2);
+	        __HAL_TIM_SET_COUNTER(timer, 0);
 	        __HAL_TIM_ENABLE(timer);
 
 	        HAL_TIM_PWM_Start(timer, channel);
+	        __enable_irq();
 	    }
 	} else {
 	    __HAL_TIM_SET_COMPARE(timer, channel, 0);
@@ -230,7 +232,7 @@ void startUserInterfaceTask(void *argument) {
 }
 
 void rampDownMotor(float from) {
-    for (int i = (int)(from*1000.0); i >= 40; i-=1) {
+    for (int i = (int)(from*1000.0); i >= 50; i-=1) {
     	if (!status.motorRunning) break;
         setMotorSpeed(i / 1000.0);
         osDelay(50);
@@ -251,7 +253,7 @@ void startMotorTask(void *argument) {
             status.programProgress = 0;
             status.startTick = getTimeTicks();
 			status.motorRunning = true;
-            for (int i = 400; i < (int)(motorSpeed*10000.0); i++) {
+            for (int i = 500; i < (int)(motorSpeed*10000.0); i++) {
                 setMotorSpeed(i / 10000.0);
                 osDelay(15);
                 if (!status.programRunning) break;
@@ -262,7 +264,7 @@ void startMotorTask(void *argument) {
                 osDelay(1000);
             }
 
-            rampDownMotor(motorSpeed);
+            rampDownMotor(status.getMotorSpeed());
             setMotorSpeed(0);
 			status.motorRunning = false;
         }

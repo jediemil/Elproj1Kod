@@ -71,7 +71,7 @@ void UserInterface::drawInfoScreen() {
     char buffer[40];
     //buffer = std::format("Hello {}!", status->getMotorSpeed()*100);
     __disable_irq();
-    sprintf(buffer, "Motor speed: %d%%", (int)(status->getMotorSpeed()*100.0 + 0.5));
+    sprintf(buffer, "Motor speed: %d%%", (int)((status->getMotorSpeed() - 0.05)*1000)+ 0.5);
     __enable_irq();
     //sprintf(buffer, "Motor speed: d");
     ssd1306_SetCursor(0, 0);
@@ -111,10 +111,10 @@ void UserInterface::drawInfoScreen() {
             ssd1306_Line(20, 31, 108, 31, Black);
         }
 
-        char line1[] = "Cancel";
+        char line1[] = "Stop program";
         ssd1306_SetCursor(22, 12);
         ssd1306_WriteString(line1, Font_6x8, Black);
-        char line2[] = "Return";
+        char line2[] = "Resume";
         ssd1306_SetCursor(22, 22);
         ssd1306_WriteString(line2, Font_6x8, Black);
 
@@ -131,18 +131,8 @@ void UserInterface::drawInfoScreen() {
 
 void UserInterface::drawAutostart() {
     ssd1306_Fill(Black);
-
-    char line1[] = "Click to start\0";
-    ssd1306_SetCursor(0, 0);
-    ssd1306_WriteString(line1, Font_7x10, White);
-    char line2[] = "AUTOFUNCTIO\0";
-    ssd1306_SetCursor(0, 11);
-    ssd1306_WriteString(line2, Font_11x18, White);
-    char line3[] = "N\0";
-    ssd1306_SetCursor(56, 30);
-    ssd1306_WriteString(line3, Font_16x26, White);
-
-    ssd1306_UpdateScreen();
+	ssd1306_DrawBitmap(0, 0, epd_bitmap_AutoProgram, 128, 64, White);
+	ssd1306_UpdateScreen();
 }
 
 void UserInterface::drawLidOpen() {
@@ -162,18 +152,14 @@ void UserInterface::drawLidOpen() {
 }
 
 void UserInterface::drawCustomProgram() {
-	ssd1306_Fill(Black);
+    ssd1306_Fill(Black);
+	ssd1306_DrawBitmap(0, 0, epd_bitmap_CustomProgram, 128, 64, White);
+	ssd1306_UpdateScreen();
+}
 
-	char line1[] = "Click to start\0";
-	ssd1306_SetCursor(0, 0);
-	ssd1306_WriteString(line1, Font_7x10, White);
-	char line2[] = "CUSTOM PROGRA\0";
-	ssd1306_SetCursor(0, 11);
-	ssd1306_WriteString(line2, Font_11x18, White);
-	char line3[] = "M\0";
-	ssd1306_SetCursor(56, 30);
-	ssd1306_WriteString(line3, Font_16x26, White);
-
+void UserInterface::drawCreditsSelection() {
+    ssd1306_Fill(Black);
+	ssd1306_DrawBitmap(0, 0, epd_bitmap_CreditsMenu, 128, 64, White);
 	ssd1306_UpdateScreen();
 }
 
@@ -186,17 +172,17 @@ void UserInterface::drawCredits() {
 	char line5[] = "Karl Stenberg\0";
 	char line6[] = "Emil Reyier Hedin\0";
 
-	ssd1306_SetCursor(3, 0);
+	ssd1306_SetCursor(0, 0);
 	ssd1306_WriteString(line1, Font_11x18, White);
-	ssd1306_SetCursor(13, 19);
+	ssd1306_SetCursor(0, 19);
 	ssd1306_WriteString(line2, Font_6x8, White);
-	ssd1306_SetCursor(2, 28);
+	ssd1306_SetCursor(0, 28);
 	ssd1306_WriteString(line3, Font_6x8, White);
-	ssd1306_SetCursor(4, 37);
+	ssd1306_SetCursor(0, 37);
 	ssd1306_WriteString(line4, Font_6x8, White);
-	ssd1306_SetCursor(2, 46);
+	ssd1306_SetCursor(0, 46);
 	ssd1306_WriteString(line5, Font_6x8, White);
-	ssd1306_SetCursor(7, 55);
+	ssd1306_SetCursor(0, 55);
 	ssd1306_WriteString(line6, Font_6x8, White);
 
 	ssd1306_UpdateScreen();
@@ -204,23 +190,23 @@ void UserInterface::drawCredits() {
 
 void UserInterface::drawCustomProgramSettings() {
 	ssd1306_Fill(Black);
-	selection = (selection + 6) % 6;
+	selection = (selection + 4) % 4;
 
-	selectedProgramLen = std::max(std::min((int)selectedProgramLen, 60), 6);
+	selectedProgramLen = std::max(std::min((int)selectedProgramLen, 60), 3);
 	selectedTemperature = std::max(std::min((int)selectedTemperature, 200), 60);
 	selectedDrinkSize = std::max(std::min((int)selectedDrinkSize, 100), 7);
-	selectedMotorSpeed = std::max(std::min((int)selectedMotorSpeed, 50), 4);
+	selectedMotorSpeed = std::max(std::min((int)selectedMotorSpeed, 100), 1);
 
 	if (selected) {
 		clickCall = &UserInterface::unselect;
-		if (selection <= 3) {
+		if (selection <= 1) {
 			leftCall = &UserInterface::decreaseVariable;
 			rightCall = &UserInterface::increaseVariable;
-		} else if (selection == 4) {
+		} else if (selection == 2) {
 			selected = false;
 			selection = 0;
 			startProgram();
-		} else if (selection == 5) {
+		} else if (selection == 3) {
 			selected = false;
 			selection = 0;
 			setupCustomProgram();
@@ -233,8 +219,8 @@ void UserInterface::drawCustomProgramSettings() {
 
 	char line1[] = "Custom settings\0";
 	char line2[] = "Time\0";
-	char line3[] = "Goal temp\0";
-	char line4[] = "Drink size\0";
+	//char line3[] = "Goal temp\0";
+	//char line4[] = "Drink size\0";
 	char line5[] = "Motor speed\0";
 	char line6[] = "Start Program\0";
 	char line7[] = "Cancel\0";
@@ -260,7 +246,7 @@ void UserInterface::drawCustomProgramSettings() {
 	__enable_irq();
 	drawSettingCell(9, (selection==0)&&!selected, (selection==0)&&selected, line2, buffer);
 
-	__disable_irq();
+	/*__disable_irq();
 	sprintf(buffer, "%.1f C", selectedTemperature/10.0);
 	__enable_irq();
 	drawSettingCell(18, (selection==1)&&!selected, (selection==1)&&selected, line3, buffer);
@@ -268,21 +254,24 @@ void UserInterface::drawCustomProgramSettings() {
 	__disable_irq();
 	sprintf(buffer, "%d cL", selectedDrinkSize);
 	__enable_irq();
-	drawSettingCell(27, (selection==2)&&!selected, (selection==2)&&selected, line4, buffer);
+	drawSettingCell(27, (selection==2)&&!selected, (selection==2)&&selected, line4, buffer);*/
 
 	__disable_irq();
 	sprintf(buffer, "%d %%", selectedMotorSpeed);
 	__enable_irq();
-	drawSettingCell(36, (selection==3)&&!selected, (selection==3)&&selected, line5, buffer);
-	drawSettingCell(45, (selection==4)&&!selected, (selection==4)&&selected, line6, NULL);
-	drawSettingCell(54, (selection==5)&&!selected, (selection==5)&&selected, line7, NULL);
+	//drawSettingCell(36, (selection==3)&&!selected, (selection==3)&&selected, line5, buffer);
+	//drawSettingCell(45, (selection==4)&&!selected, (selection==4)&&selected, line6, NULL);
+	//drawSettingCell(54, (selection==5)&&!selected, (selection==5)&&selected, line7, NULL);
+	drawSettingCell(18, (selection==1)&&!selected, (selection==1)&&selected, line5, buffer);
+	drawSettingCell(45, (selection==2)&&!selected, (selection==2)&&selected, line6, NULL);
+	drawSettingCell(54, (selection==3)&&!selected, (selection==3)&&selected, line7, NULL);
 
 	ssd1306_UpdateScreen();
 }
 
 void UserInterface::drawSettingCell(uint8_t y, bool highlighted, bool selected, char* text, char* value) {
 	if (highlighted) {
-	    ssd1306_FillRectangle(0, y, 100, y+8, White);
+	    ssd1306_FillRectangle(0, y, 90, y+8, White);
 	}
 	ssd1306_SetCursor(0, y);
 	ssd1306_WriteString(text, Font_6x8, (SSD1306_COLOR)!highlighted);
@@ -317,24 +306,30 @@ void UserInterface::setupInfoScreen() {
 }
 
 void UserInterface::setupAutostart() {
-
     clickCall = &UserInterface::autostart;
-    leftCall = &UserInterface::setupCredits;
+    leftCall = &UserInterface::setupCreditsSelection;
     rightCall = &UserInterface::setupCustomProgram;
     currentScreen = &UserInterface::drawAutostart;
 }
 
-void UserInterface::setupCredits() {
+void UserInterface::setupCreditsSelection() {
     emptyCalls();
     leftCall = &UserInterface::setupCustomProgram;
     rightCall = &UserInterface::setupAutostart;
+    clickCall = &UserInterface::setupCredits;
+    currentScreen = &UserInterface::drawCreditsSelection;
+}
+
+void UserInterface::setupCredits() {
+    emptyCalls();
+    clickCall = &UserInterface::setupCreditsSelection;
     currentScreen = &UserInterface::drawCredits;
 }
 
 void UserInterface::setupCustomProgram() {
     emptyCalls();
     leftCall = &UserInterface::setupAutostart;
-    rightCall = &UserInterface::setupCredits;
+    rightCall = &UserInterface::setupCreditsSelection;
     clickCall = &UserInterface::setupCustomProgramSettings;
     currentScreen = &UserInterface::drawCustomProgram;
 }
@@ -361,7 +356,7 @@ void UserInterface::autostart() {
 void UserInterface::startProgram() {
 	status->programType = PROGRAM_TYPE_CUSTOM;
 	status->programLen = selectedProgramLen*5;
-	status->selectedMotorSpeed = selectedMotorSpeed/100.0;
+	status->selectedMotorSpeed = selectedMotorSpeed/100.0 * 0.1 + 0.05;
 	status->targetTemp = selectedTemperature/10.0;
 	status->drinkSize = selectedDrinkSize*10; //cL -> mL
 	status->programRunning = true;
