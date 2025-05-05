@@ -40,7 +40,7 @@ UserInterface::UserInterface(Status *status) {
     selectedProgramLen = 120/5;
     selectedTemperature = 100;
     selectedDrinkSize = 33;
-    selectedMotorSpeed = 10;
+    selectedMotorSpeed = 50/5;
 }
 
 void UserInterface::begin() {
@@ -71,7 +71,7 @@ void UserInterface::drawInfoScreen() {
     char buffer[40];
     //buffer = std::format("Hello {}!", status->getMotorSpeed()*100);
     __disable_irq();
-    sprintf(buffer, "Motor speed: %d%%", (int)((status->getMotorSpeed() - 0.05)*1000)+ 0.5);
+    sprintf(buffer, "Motor speed: %d%%", (int)(((status->getMotorSpeed() - 0.05)*1000)+ 0.5));
     __enable_irq();
     //sprintf(buffer, "Motor speed: d");
     ssd1306_SetCursor(0, 0);
@@ -195,7 +195,7 @@ void UserInterface::drawCustomProgramSettings() {
 	selectedProgramLen = std::max(std::min((int)selectedProgramLen, 60), 3);
 	selectedTemperature = std::max(std::min((int)selectedTemperature, 200), 60);
 	selectedDrinkSize = std::max(std::min((int)selectedDrinkSize, 100), 7);
-	selectedMotorSpeed = std::max(std::min((int)selectedMotorSpeed, 100), 1);
+	selectedMotorSpeed = std::max(std::min((int)selectedMotorSpeed, 20), 1);
 
 	if (selected) {
 		clickCall = &UserInterface::unselect;
@@ -257,7 +257,7 @@ void UserInterface::drawCustomProgramSettings() {
 	drawSettingCell(27, (selection==2)&&!selected, (selection==2)&&selected, line4, buffer);*/
 
 	__disable_irq();
-	sprintf(buffer, "%d %%", selectedMotorSpeed);
+	sprintf(buffer, "%d %%", selectedMotorSpeed*5);
 	__enable_irq();
 	//drawSettingCell(36, (selection==3)&&!selected, (selection==3)&&selected, line5, buffer);
 	//drawSettingCell(45, (selection==4)&&!selected, (selection==4)&&selected, line6, NULL);
@@ -356,7 +356,7 @@ void UserInterface::autostart() {
 void UserInterface::startProgram() {
 	status->programType = PROGRAM_TYPE_CUSTOM;
 	status->programLen = selectedProgramLen*5;
-	status->selectedMotorSpeed = selectedMotorSpeed/100.0 * 0.1 + 0.05;
+	status->selectedMotorSpeed = selectedMotorSpeed/20.0 * 0.1 + 0.05;
 	status->targetTemp = selectedTemperature/10.0;
 	status->drinkSize = selectedDrinkSize*10; //cL -> mL
 	status->programRunning = true;

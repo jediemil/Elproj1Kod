@@ -70,7 +70,7 @@ private:
     uint16_t selectedDrinkSize;
     uint16_t selectedMotorSpeed;
 
-    uint16_t* variableSelection[4] = {&selectedProgramLen, &selectedTemperature, &selectedDrinkSize, &selectedMotorSpeed};
+    uint16_t* variableSelection[2] = {&selectedProgramLen, &selectedMotorSpeed};//&selectedTemperature, &selectedDrinkSize, &selectedMotorSpeed};
 
     Status *status;
 
