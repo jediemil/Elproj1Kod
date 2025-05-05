@@ -271,7 +271,7 @@ void UserInterface::drawCustomProgramSettings() {
 
 void UserInterface::drawSettingCell(uint8_t y, bool highlighted, bool selected, char* text, char* value) {
 	if (highlighted) {
-	    ssd1306_FillRectangle(0, y, 90, y+8, White);
+	    ssd1306_FillRectangle(0, y, 85, y+8, White);
 	}
 	ssd1306_SetCursor(0, y);
 	ssd1306_WriteString(text, Font_6x8, (SSD1306_COLOR)!highlighted);
@@ -279,9 +279,9 @@ void UserInterface::drawSettingCell(uint8_t y, bool highlighted, bool selected, 
 	if (value == NULL) return;
 
 	if (selected) {
-		    ssd1306_FillRectangle(101, y, 128, y+8, White);
+		    ssd1306_FillRectangle(93, y, 128, y+8, White);
 	}
-	ssd1306_SetCursor(101, y);
+	ssd1306_SetCursor(93, y);
 	ssd1306_WriteString(value, Font_6x8, (SSD1306_COLOR)!selected);
 }
 
@@ -341,7 +341,7 @@ void UserInterface::setupCustomProgramSettings() {
     rightCall = &UserInterface::increaseSelection;
     selected = false;
     selection = 0;
-    maxSelection = 6;
+    maxSelection = 4;
     currentScreen = &UserInterface::drawCustomProgramSettings;
 }
 
