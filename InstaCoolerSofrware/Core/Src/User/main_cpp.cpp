@@ -5,6 +5,9 @@
  *      Author: emilr
  */
 
+// SSD1306 library: https://github.com/afiskon/stm32-ssd1306
+// STUSB4500 library:  https://github.com/jefflongo/stusb4500
+
 #include "main_cpp.h"
 
 #include <stdlib.h>
