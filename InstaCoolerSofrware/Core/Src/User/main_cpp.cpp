@@ -29,7 +29,6 @@
 
 static Status status;
 static UserInterface userInterface(&status);
-volatile uint8_t encoder_counter = 0; //TODO: Varför volatile?
 uint64_t timeTicks = 0; // 0.01 s
 
 osThreadId_t motorTaskHandle;
