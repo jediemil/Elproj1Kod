@@ -213,14 +213,10 @@ void playBuzzerMusic(void* argument) {
 		uint16_t delay = ((*ptr)&0b1111) * 50;
 
 		setBuzzerFrequency(freq);
-		osDelay(1); // Let the buzzer hardware settle (optional, but helps)
 		osDelay(delay);
-		setBuzzerFrequency(0); // Stop tone between notes
-		osDelay(10); // Short pause between notes
 		ptr++;
 	}
 	setBuzzerFrequency(0);
-	//setRGB(255,0,255);
 	osThreadExit();
 }
 
