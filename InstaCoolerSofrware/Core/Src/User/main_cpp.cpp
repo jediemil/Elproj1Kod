@@ -208,18 +208,18 @@ bool write_nvm() {
 }
 
 void playBuzzerMusic(void* argument) {
-	uint16_t* ptr = (uint16_t*) argument;
-	while (*ptr != 0) {
+	uint16_t* ptr = (uint16_t*) argument; // When playBuzzerMusic is called, a pointer to a music dara array is passed.
+	while (*ptr != 0) { // The music data array is ended with a zero byte -> if *ptr is zero: the music has finished
 		uint16_t value = *ptr;
-		uint16_t freq = value >> 4;
-		uint16_t delay = ((*ptr)&0b1111) * 50;
+		uint16_t freq = value >> 4; // The frequency is encoded in the 12 most significant bits
+		uint16_t delay = ((*ptr)&0b1111) * 50; // The note play time is encoded in the bottom 4 bits
 
 		setBuzzerFrequency(freq);
 		osDelay(delay);
-		ptr++;
+		ptr++; // Go to next element of the music data array
 	}
 	setBuzzerFrequency(0);
-	osThreadExit();
+	osThreadExit(); // End the current thread
 }
 
 void startUserInterfaceTask(void *argument) {
