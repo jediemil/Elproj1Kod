@@ -102,25 +102,6 @@ void setPWM(TIM_HandleTypeDef *timer_handle, uint32_t timer_channel, float duty)
 }
 
 void setBuzzerFrequency(uint32_t frequency) {
-    //TODO: SKRIV OM KOD SÅ DNE ÄR RIMLIG OCH VÅR EGEN
-    /*TIM_HandleTypeDef *timer = &BUZZER_TIMER_HANDLE; // Using the timer instance htim3
-    uint32_t channel = BUZZER_TIMER_CHANNEL; // Using channel 1
-    if (frequency) {
-        uint32_t timer_clk_freq = HAL_RCC_GetSysClockFreq(); // Get the timer base clock frequency (after APB scaling)
-        uint32_t prescaler = timer->Init.Prescaler; // Get the prescaler value from the timer setup
-        uint32_t tick_freq = timer_clk_freq / (prescaler + 1); // Calculate the actual tick frequency
-
-        uint32_t counter_period = (tick_freq / frequency) - 1;
-        // Calculate the counter period (ARR) based on the desired frequency (ARR = number of ticks per period)
-        __HAL_TIM_DISABLE(timer);
-        __HAL_TIM_SET_AUTORELOAD(timer, counter_period);
-        __HAL_TIM_ENABLE(timer);
-
-        setPWM(timer, channel,0.5);
-    } else {
-        setPWM(timer, channel,0);
-        //setRGB(255,0,0);
-    }*/
 	TIM_HandleTypeDef *timer = &BUZZER_TIMER_HANDLE;
 	uint32_t channel = BUZZER_TIMER_CHANNEL;
 
